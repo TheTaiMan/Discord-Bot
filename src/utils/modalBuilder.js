@@ -3,47 +3,64 @@ const {
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
 } = require('discord.js')
 
-function createNameModal() {
-  const modal = new ModalBuilder()
-    .setCustomId('name-modal')
-    .setTitle('Enter Your Name')
+function createQuestionModal(
+  customId,
+  title,
+  label,
+  placeholder,
+  minLength = 1,
+  maxLength = 100
+) {
+  const modal = new ModalBuilder().setCustomId(customId).setTitle(title)
 
-  const nameInput = new TextInputBuilder()
-    .setCustomId('name-input')
-    .setLabel('What is your full name?')
+  const input = new TextInputBuilder()
+    .setCustomId(`${customId}-input`)
+    .setLabel(label)
     .setStyle(TextInputStyle.Short)
-    .setMinLength(2)
-    .setMaxLength(50)
-    .setPlaceholder('John Doe')
+    .setMinLength(minLength)
+    .setMaxLength(maxLength)
+    .setPlaceholder(placeholder)
     .setRequired(true)
 
-  const firstActionRow = new ActionRowBuilder().addComponents(nameInput)
-  modal.addComponents(firstActionRow)
+  modal.addComponents(new ActionRowBuilder().addComponents(input))
   return modal
 }
 
-function createEmailModal() {
-  const modal = new ModalBuilder()
-    .setCustomId('email-modal')
-    .setTitle('Enter Your Email')
-
-  const emailInput = new TextInputBuilder()
-    .setCustomId('email-input')
-    .setLabel('What is your email address?')
-    .setStyle(TextInputStyle.Short)
-    .setMinLength(5)
-    .setMaxLength(100)
-    .setPlaceholder('john@example.com')
-    .setRequired(true)
-
-  const firstActionRow = new ActionRowBuilder().addComponents(emailInput)
-  modal.addComponents(firstActionRow)
-  return modal
+function createQuestionButton(customId, label) {
+  return new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(customId)
+      .setLabel(label)
+      .setStyle(ButtonStyle.Primary)
+  )
 }
+
+const questions = [
+  {
+    id: 'name',
+    question: 'What is your full name?',
+    buttonLabel: 'Enter Full Name',
+    modalTitle: 'Full Name',
+    modalLabel: 'What is your full name?',
+    placeholder: 'John Joe',
+  },
+  {
+    id: 'email',
+    question: 'What is your student email address?',
+    buttonLabel: 'Enter Email',
+    modalTitle: 'Student Email',
+    modalLabel: 'What is your student email address?',
+    placeholder: 'student@university.edu',
+  },
+  // Add more questions following the same format
+]
 
 module.exports = {
-  createNameModal,
-  createEmailModal,
+  createQuestionModal,
+  createQuestionButton,
+  questions,
 }
