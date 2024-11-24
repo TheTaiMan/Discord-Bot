@@ -1,23 +1,53 @@
-const { questions, createQuestionButton } = require('./modalBuilder')
+const {
+  questions,
+  createQuestionButton,
+  ButtonStyle,
+} = require('./modalBuilder')
 const UserManager = require('./UserManager')
 
 async function sendNextQuestion(channel, userData) {
   const nextQuestion = questions[userData.currentQuestion]
 
-  console.log('nextQuestion: ', nextQuestion)
+  if (userData.isComplete()) {
+    // Show summary and update options
+    const responsesSummary = Object.entries(userData.responses)
+      .map(
+        ([key, value]) =>
+          `**${key.charAt(0).toUpperCase() + key.slice(1)}**: ${value}`
+      )
+      .join('\n')
 
-  await channel.send({
-    content: nextQuestion.question,
-    components: [
+    const updateButtons = questions.map((q) =>
       createQuestionButton(
-        `${nextQuestion.id}-question`,
-        nextQuestion.buttonLabel
-      ),
-    ],
-  })
+        `${q.id}-question`,
+        `Update ${q.modalTitle}`,
+        ButtonStyle.Secondary
+      )
+    )
+
+    // Add submit button
+    updateButtons.push(
+      createQuestionButton('submit-form', 'Submit Form', ButtonStyle.Success)
+    )
+
+    await channel.send({
+      content: `Here's your information:\n${responsesSummary}\n\nWould you like to update anything?`,
+      components: updateButtons,
+    })
+  } else {
+    // Show only current question button
+    await channel.send({
+      content: nextQuestion.question,
+      components: [
+        createQuestionButton(
+          `${nextQuestion.id}-question`,
+          nextQuestion.buttonLabel
+        ),
+      ],
+    })
+  }
 }
 
-// This is what happens when you submit the a form for a single question
 async function handleModalSubmission(interaction) {
   const questionId = interaction.customId.replace('-modal', '')
   const response = interaction.fields.getTextInputValue(
@@ -29,32 +59,34 @@ async function handleModalSubmission(interaction) {
     questionId,
     response
   )
-
-  // ! Prints the Current User Data 
-  UserManager.printUserData(interaction.user.id)
-
-  // Add null check here
-  if (!userData) {
-    await interaction.reply({
-      content:
-        'Sorry, there was an error processing your response. Please try again.',
-      ephemeral: true,
-    })
-    return
-  }
+  if (!userData) return
 
   const channel = await interaction.client.channels.fetch(userData.channelId)
-  await interaction.reply({ content: 'Response recorded!', ephemeral: true })
 
-  if (userData.isComplete()) {
+  // Show what was updated with the new value
+  await interaction.reply({
+    content: `Your ${questionId} has been ${
+      userData.isNewResponse ? 'recorded' : 'updated'
+    } to: "${response}"`,
+    ephemeral: true,
+  })
+
+  if (userData.hasUpdatedResponse && userData.isComplete()) {
+    // Show all responses and submit button after update
+    const responsesSummary = Object.entries(userData.responses)
+      .map(
+        ([key, value]) =>
+          `**${key.charAt(0).toUpperCase() + key.slice(1)}**: ${value}`
+      )
+      .join('\n')
+
     await channel.send({
-      content: 'Form completed! Your responses are being reviewed.',
-      components: [],
+      content: `Here's your updated information:\n${responsesSummary}\n\nWould you like to submit now?`,
+      components: [
+        createQuestionButton('submit-form', 'Submit Form', ButtonStyle.Success),
+      ],
     })
-
-    // ! Removes the user but I want to send to Notion here
-    UserManager.removeUser(interaction.user.id)
-  } else {
+  } else if (!userData.hasUpdatedResponse) {
     await sendNextQuestion(channel, userData)
   }
 }

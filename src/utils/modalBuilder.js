@@ -63,4 +63,5 @@ module.exports = {
   createQuestionModal,
   createQuestionButton,
   questions,
+  ButtonStyle,
 }

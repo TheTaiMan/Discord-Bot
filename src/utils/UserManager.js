@@ -6,12 +6,18 @@ class UserData {
     this.channelId = channelId
     this.currentQuestion = 0
     this.responses = {}
-    this.timestamp = new Date()
+    this.hasUpdatedResponse = false
+    this.isNewResponse = true
   }
 
   updateResponse(questionId, response) {
+    this.isNewResponse = !this.responses[questionId]
+    this.hasUpdatedResponse = !this.isNewResponse
     this.responses[questionId] = response
-    this.currentQuestion += 1
+
+    if (this.isNewResponse) {
+      this.currentQuestion += 1
+    }
   }
 
   isComplete() {
@@ -19,6 +25,7 @@ class UserData {
   }
 }
 
+// This is how the bot can handle multiple responses at once
 class UserManager {
   constructor() {
     this.users = new Map()

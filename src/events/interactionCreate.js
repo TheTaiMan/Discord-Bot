@@ -6,7 +6,6 @@ const {
   handleModalSubmission,
 } = require('../utils/questionHandler')
 
-
 // Handles the on boarding button press
 const handleOnboarding = async (interaction) => {
   try {
@@ -48,21 +47,32 @@ const handleForm = async (interaction) => {
   }
 }
 
+const handleSubmit = async (interaction) => {
+  const userData = UserManager.getUser(interaction.user.id)
+  if (userData) {
+    await interaction.update({
+      content:
+        'Form submitted successfully! Your responses are being reviewed.',
+      components: [],
+    })
+
+    UserManager.removeUser(interaction.user.id)
+  }
+}
+
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
     if (interaction.isButton()) {
-      const isOnBoarding = interaction.customId === 'start-onboarding'
-      const isOnForm = interaction.customId.endsWith('-question')
-
-      if (isOnBoarding) {
-        handleOnboarding(interaction)
-      } else if (isOnForm) {
-        handleForm(interaction)
+      if (interaction.customId === 'submit-form') {
+        await handleSubmit(interaction)
+      } else if (interaction.customId === 'start-onboarding') {
+        await handleOnboarding(interaction)
+      } else if (interaction.customId.endsWith('-question')) {
+        await handleForm(interaction)
       }
     }
 
-    // When you press the submit button for a question modal (form)
     if (interaction.isModalSubmit()) {
       await handleModalSubmission(interaction)
     }
