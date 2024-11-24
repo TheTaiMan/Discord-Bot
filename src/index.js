@@ -21,7 +21,7 @@ for (const file of eventFiles) {
     // If the event should only be triggered once, register it with client.once()
     client.once(event.name, (...args) => event.execute(...args))
   } else {
-    // Otherwise, register it with client.on() to trigger it on every event
+    // Otherwise, register it with client.on() to trigger it on every event (this is an event listener)
     client.on(event.name, (...args) => event.execute(...args))
   }
 }

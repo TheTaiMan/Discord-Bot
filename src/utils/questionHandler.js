@@ -4,14 +4,7 @@ const UserManager = require('./UserManager')
 async function sendNextQuestion(channel, userData) {
   const nextQuestion = questions[userData.currentQuestion]
 
-  if (!nextQuestion) {
-    await channel.send({
-      content:
-        'Thank you for completing the form! Your responses are being reviewed.',
-      components: [],
-    })
-    return
-  }
+  console.log('nextQuestion: ', nextQuestion)
 
   await channel.send({
     content: nextQuestion.question,
@@ -24,6 +17,7 @@ async function sendNextQuestion(channel, userData) {
   })
 }
 
+// This is what happens when you submit the a form for a single question
 async function handleModalSubmission(interaction) {
   const questionId = interaction.customId.replace('-modal', '')
   const response = interaction.fields.getTextInputValue(
@@ -36,6 +30,19 @@ async function handleModalSubmission(interaction) {
     response
   )
 
+  // ! Prints the Current User Data 
+  UserManager.printUserData(interaction.user.id)
+
+  // Add null check here
+  if (!userData) {
+    await interaction.reply({
+      content:
+        'Sorry, there was an error processing your response. Please try again.',
+      ephemeral: true,
+    })
+    return
+  }
+
   const channel = await interaction.client.channels.fetch(userData.channelId)
   await interaction.reply({ content: 'Response recorded!', ephemeral: true })
 
@@ -44,6 +51,8 @@ async function handleModalSubmission(interaction) {
       content: 'Form completed! Your responses are being reviewed.',
       components: [],
     })
+
+    // ! Removes the user but I want to send to Notion here
     UserManager.removeUser(interaction.user.id)
   } else {
     await sendNextQuestion(channel, userData)

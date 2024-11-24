@@ -43,6 +43,13 @@ class UserManager {
     return null
   }
 
+  printUserData(userId) {
+    const userData = this.getUser(userId)
+    if (userData) {
+      console.log(userData.responses)
+    }
+  }
+
   removeUser(userId) {
     this.users.delete(userId)
   }
