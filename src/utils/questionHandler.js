@@ -5,35 +5,39 @@ const {
 } = require('./modalBuilder')
 const UserManager = require('./UserManager')
 
+const onCompleted = async (channel, userData) => {
+  // Show summary and update options
+  const responsesSummary = Object.entries(userData.responses)
+    .map(
+      ([key, value]) =>
+        `**${key.charAt(0).toUpperCase() + key.slice(1)}**: ${value}`
+    )
+    .join('\n')
+
+  const updateButtons = questions.map((q) =>
+    createQuestionButton(
+      `${q.id}-question`,
+      `Update ${q.modalTitle}`,
+      ButtonStyle.Secondary
+    )
+  )
+
+  // Add submit button
+  updateButtons.push(
+    createQuestionButton('submit-form', 'Submit Form', ButtonStyle.Success)
+  )
+
+  await channel.send({
+    content: `Here's your information:\n${responsesSummary}\n\nWould you like to update anything?`,
+    components: updateButtons,
+  })
+}
+
 async function sendNextQuestion(channel, userData) {
   const nextQuestion = questions[userData.currentQuestion]
 
   if (userData.isComplete()) {
-    // Show summary and update options
-    const responsesSummary = Object.entries(userData.responses)
-      .map(
-        ([key, value]) =>
-          `**${key.charAt(0).toUpperCase() + key.slice(1)}**: ${value}`
-      )
-      .join('\n')
-
-    const updateButtons = questions.map((q) =>
-      createQuestionButton(
-        `${q.id}-question`,
-        `Update ${q.modalTitle}`,
-        ButtonStyle.Secondary
-      )
-    )
-
-    // Add submit button
-    updateButtons.push(
-      createQuestionButton('submit-form', 'Submit Form', ButtonStyle.Success)
-    )
-
-    await channel.send({
-      content: `Here's your information:\n${responsesSummary}\n\nWould you like to update anything?`,
-      components: updateButtons,
-    })
+    onCompleted(channel, userData)
   } else {
     // Show only current question button
     await channel.send({
@@ -41,7 +45,8 @@ async function sendNextQuestion(channel, userData) {
       components: [
         createQuestionButton(
           `${nextQuestion.id}-question`,
-          nextQuestion.buttonLabel
+          nextQuestion.buttonLabel,
+          ButtonStyle.Primary
         ),
       ],
     })

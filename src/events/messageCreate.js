@@ -8,7 +8,7 @@ const {
 module.exports = {
   name: 'messageCreate',
   async execute(msg) {
-    if (msg.content === '!setup-onboarding') {
+    if (msg.content === '!setup-onboarding') { // ! Make sure user has proper permissions
       const channel = await msg.guild.channels.create({
         name: 'onboarding',
         type: ChannelType.GuildText,

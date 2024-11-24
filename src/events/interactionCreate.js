@@ -56,8 +56,9 @@ const handleSubmit = async (interaction) => {
         'Form submitted successfully! Your responses are being reviewed.',
       components: [],
     })
-
-    // Send to Notion API
+    // ! Prints the user data
+    UserManager.printUserData(interaction.user.id)
+    
     UserManager.removeUser(interaction.user.id)
   }
 }

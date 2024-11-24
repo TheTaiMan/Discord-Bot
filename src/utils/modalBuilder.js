@@ -31,12 +31,12 @@ function createQuestionModal(
   return modal
 }
 
-function createQuestionButton(customId, label) {
+function createQuestionButton(customId, label, buttonStyle) {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId(customId)
       .setLabel(label)
-      .setStyle(ButtonStyle.Primary)
+      .setStyle(buttonStyle)
   )
 }
 
