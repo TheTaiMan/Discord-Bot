@@ -41,7 +41,8 @@ const handleForm = async (interaction) => {
       `${questionId}-modal`,
       question.modalTitle,
       question.modalLabel,
-      question.placeholder
+      question.placeholder,
+      question.inputStyle
     )
     await interaction.showModal(modal)
   }

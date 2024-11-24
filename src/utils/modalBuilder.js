@@ -12,6 +12,7 @@ function createQuestionModal(
   title,
   label,
   placeholder,
+  inputStyle,
   minLength = 1,
   maxLength = 100
 ) {
@@ -20,7 +21,7 @@ function createQuestionModal(
   const input = new TextInputBuilder()
     .setCustomId(`${customId}-input`)
     .setLabel(label)
-    .setStyle(TextInputStyle.Short)
+    .setStyle(TextInputStyle[inputStyle]) // Change this to TextInputStyle.Paragraph when inputting Paragraphs/sentences
     .setMinLength(minLength)
     .setMaxLength(maxLength)
     .setPlaceholder(placeholder)
@@ -47,6 +48,7 @@ const questions = [
     modalTitle: 'Full Name',
     modalLabel: 'What is your full name?',
     placeholder: 'John Joe',
+    inputStyle: 'Short',
   },
   {
     id: 'email',
@@ -55,9 +57,12 @@ const questions = [
     modalTitle: 'Student Email',
     modalLabel: 'What is your student email address?',
     placeholder: 'student@university.edu',
+    inputStyle: 'Short',
   },
   // Add more questions following the same format
 ]
+
+// inputStyle: 'Short' or 'Paragraph'
 
 module.exports = {
   createQuestionModal,
