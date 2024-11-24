@@ -7,19 +7,28 @@ async function createPrivateChannel(interaction) {
     type: ChannelType.GuildText,
     permissionOverwrites: [
       {
-        id: interaction.guild.id,
+        id: interaction.guild.id, // Deny everyone by default
         deny: [PermissionFlagsBits.ViewChannel],
       },
       {
-        id: interaction.user.id,
+        id: interaction.user.id, // Grant viewing but deny sending messages, threads, and reactions
         allow: [PermissionFlagsBits.ViewChannel],
-        deny: [PermissionFlagsBits.SendMessages],
+        deny: [
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.CreatePublicThreads,
+          PermissionFlagsBits.CreatePrivateThreads,
+          PermissionFlagsBits.AddReactions,
+        ],
       },
       {
-        id: interaction.client.user.id,
+        id: interaction.client.user.id, // Bot permissions
         allow: [
           PermissionFlagsBits.ViewChannel,
           PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.CreatePublicThreads,
+          PermissionFlagsBits.CreatePrivateThreads,
+          PermissionFlagsBits.AddReactions,
+          PermissionFlagsBits.ManageChannels,
         ],
       },
     ],
