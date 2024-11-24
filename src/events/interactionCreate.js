@@ -56,6 +56,7 @@ const handleSubmit = async (interaction) => {
       components: [],
     })
 
+    // Send to Notion API
     UserManager.removeUser(interaction.user.id)
   }
 }
