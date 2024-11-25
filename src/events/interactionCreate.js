@@ -1,6 +1,4 @@
-const {
-  createQuestionModal,
-} = require('../utils/modalBuilder')
+const { createQuestionModal } = require('../utils/modalBuilder')
 const { questions } = require('../questions')
 const UserManager = require('../utils/UserManager')
 const { createPrivateChannel } = require('../utils/channelManager')
@@ -13,8 +11,23 @@ const {
 // Handles the on boarding button press
 const handleOnboarding = async (interaction) => {
   try {
+    // Check if a channel already exists for this user
+    const existingChannel = interaction.guild.channels.cache.find(
+      (channel) => channel.name === `onboarding-${interaction.user.id}`
+    )
+
+    if (existingChannel) {
+      // If channel exists, direct them to it
+      await interaction.reply({
+        content: `You already have an ongoing verification process. Please check ${existingChannel} to complete your verification.`,
+        ephemeral: true,
+      })
+      return
+    }
+
+    // If no channel exists, create a new one
     const channel = await createPrivateChannel(interaction)
-    const userData = UserManager.createUser(interaction.user.id, channel.id) // Creates new UserData class instance
+    const userData = UserManager.createUser(interaction.user.id, channel.id)
 
     // Welcome Message
     await channel.send({
@@ -22,7 +35,7 @@ const handleOnboarding = async (interaction) => {
         'Welcome! We want to confirm that you are a university student for you to be a member and have full access to the server.',
     })
 
-    await sendNextQuestion(channel, userData) // Sends a message to the new private text channel for the user and the bot
+    await sendNextQuestion(channel, userData)
     await interaction.reply({
       content: `Please check ${channel} to complete your verification.`,
       ephemeral: true,
