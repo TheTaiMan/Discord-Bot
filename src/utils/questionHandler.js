@@ -1,9 +1,9 @@
 const {
-  questions,
   createQuestionButton,
   ButtonStyle,
 } = require('./modalBuilder')
 const UserManager = require('./UserManager')
+const {  questions } = require('../questions')
 
 const onCompleted = async (channel, userData) => {
   // Show summary and update options

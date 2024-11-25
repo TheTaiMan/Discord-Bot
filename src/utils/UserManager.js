@@ -1,5 +1,5 @@
 // utils/UserManager.js
-const { questions } = require('./modalBuilder')
+const { questions } = require('../questions')
 
 class UserData {
   constructor(channelId) {

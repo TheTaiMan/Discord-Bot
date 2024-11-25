@@ -1,4 +1,5 @@
-const { questions, createQuestionModal } = require('../utils/modalBuilder')
+const { createQuestionModal } = require('../utils/modalBuilder')
+const { questions } = require('../questions')
 const UserManager = require('../utils/UserManager')
 const { createPrivateChannel } = require('../utils/channelManager')
 const {
@@ -58,7 +59,7 @@ const handleSubmit = async (interaction) => {
     })
     // ! Prints the user data
     UserManager.printUserData(interaction.user.id)
-    
+
     UserManager.removeUser(interaction.user.id)
   }
 }
