@@ -1,6 +1,5 @@
 const {
   createQuestionModal,
-  createSelectMenu,
 } = require('../utils/modalBuilder')
 const { questions } = require('../questions')
 const UserManager = require('../utils/UserManager')
@@ -9,7 +8,6 @@ const {
   sendNextQuestion,
   handleModalSubmission,
   handleSelectMenuInteraction,
-  showSummary,
 } = require('../utils/questionHandler')
 
 // Handles the on boarding button press
