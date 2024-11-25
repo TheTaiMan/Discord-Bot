@@ -1,10 +1,15 @@
-const { createQuestionModal } = require('../utils/modalBuilder')
+const {
+  createQuestionModal,
+  createSelectMenu,
+} = require('../utils/modalBuilder')
 const { questions } = require('../questions')
 const UserManager = require('../utils/UserManager')
 const { createPrivateChannel } = require('../utils/channelManager')
 const {
   sendNextQuestion,
   handleModalSubmission,
+  handleSelectMenuInteraction,
+  showSummary,
 } = require('../utils/questionHandler')
 
 // Handles the on boarding button press
@@ -79,6 +84,10 @@ module.exports = {
 
     if (interaction.isModalSubmit()) {
       await handleModalSubmission(interaction)
+    }
+
+    if (interaction.isStringSelectMenu()) {
+      await handleSelectMenuInteraction(interaction)
     }
   },
 }

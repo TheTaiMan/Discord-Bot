@@ -1,57 +1,10 @@
 const {
   createQuestionButton,
+  createSelectMenu, // Add this import
   ButtonStyle,
 } = require('./modalBuilder')
 const UserManager = require('./UserManager')
-const {  questions } = require('../questions')
-
-const onCompleted = async (channel, userData) => {
-  // Show summary and update options
-  const responsesSummary = Object.entries(userData.responses)
-    .map(
-      ([key, value]) =>
-        `**${key.charAt(0).toUpperCase() + key.slice(1)}**: ${value}`
-    )
-    .join('\n')
-
-  const updateButtons = questions.map((q) =>
-    createQuestionButton(
-      `${q.id}-question`,
-      `Update ${q.modalTitle}`,
-      ButtonStyle.Secondary
-    )
-  )
-
-  // Add submit button
-  updateButtons.push(
-    createQuestionButton('submit-form', 'Submit Form', ButtonStyle.Success)
-  )
-
-  await channel.send({
-    content: `Here's your information:\n${responsesSummary}\n\nWould you like to update anything?`,
-    components: updateButtons,
-  })
-}
-
-async function sendNextQuestion(channel, userData) {
-  const nextQuestion = questions[userData.currentQuestion]
-
-  if (userData.isComplete()) {
-    onCompleted(channel, userData)
-  } else {
-    // Show only current question button
-    await channel.send({
-      content: nextQuestion.question,
-      components: [
-        createQuestionButton(
-          `${nextQuestion.id}-question`,
-          nextQuestion.buttonLabel,
-          ButtonStyle.Primary
-        ),
-      ],
-    })
-  }
-}
+const { questions } = require('../questions')
 
 async function handleModalSubmission(interaction) {
   const questionId = interaction.customId.replace('-modal', '')
@@ -62,13 +15,13 @@ async function handleModalSubmission(interaction) {
   const userData = UserManager.updateUserResponse(
     interaction.user.id,
     questionId,
-    response
+    response,
+    'modal'
   )
   if (!userData) return
 
   const channel = await interaction.client.channels.fetch(userData.channelId)
 
-  // Show what was updated with the new value
   await interaction.reply({
     content: `Your ${questionId} has been ${
       userData.isNewResponse ? 'recorded' : 'updated'
@@ -77,23 +30,118 @@ async function handleModalSubmission(interaction) {
   })
 
   if (userData.hasUpdatedResponse && userData.isComplete()) {
-    // Show all responses and submit button after update
-    const responsesSummary = Object.entries(userData.responses)
-      .map(
-        ([key, value]) =>
-          `**${key.charAt(0).toUpperCase() + key.slice(1)}**: ${value}`
-      )
-      .join('\n')
-
-    await channel.send({
-      content: `Here's your updated information:\n${responsesSummary}\n\nWould you like to submit now?`,
-      components: [
-        createQuestionButton('submit-form', 'Submit Form', ButtonStyle.Success),
-      ],
-    })
+    await showSummary(channel, userData)
   } else if (!userData.hasUpdatedResponse) {
     await sendNextQuestion(channel, userData)
   }
 }
 
-module.exports = { sendNextQuestion, handleModalSubmission }
+async function handleSelectMenuInteraction(interaction) {
+  const questionId = interaction.customId.replace('-select', '')
+  const values = interaction.values
+  const question = questions.find((q) => q.id === questionId)
+
+  const userData = UserManager.getUser(interaction.user.id)
+  if (!userData || !question) return
+
+  userData.updateResponse(questionId, values, question.type)
+
+  const responseText = Array.isArray(values)
+    ? values
+        .map((v) => question.options.find((opt) => opt.value === v).label)
+        .join(', ')
+    : question.options.find((opt) => opt.value === values).label
+
+  await interaction.reply({
+    content: `Your ${questionId} has been ${
+      userData.isNewResponse ? 'recorded' : 'updated'
+    } to: "${responseText}"`,
+    ephemeral: true,
+  })
+
+  const channel = await interaction.client.channels.fetch(userData.channelId)
+
+  if (userData.hasUpdatedResponse && userData.isComplete()) {
+    await showSummary(channel, userData)
+  } else if (!userData.hasUpdatedResponse) {
+    await sendNextQuestion(channel, userData)
+  }
+}
+
+async function sendNextQuestion(channel, userData) {
+  const nextQuestion = questions[userData.currentQuestion]
+
+  if (userData.isComplete()) {
+    await showSummary(channel, userData)
+  } else {
+    let components
+    switch (nextQuestion.type) {
+      case 'modal':
+        components = [
+          createQuestionButton(
+            `${nextQuestion.id}-question`,
+            nextQuestion.buttonLabel,
+            ButtonStyle.Primary
+          ),
+        ]
+        break
+      case 'select':
+      case 'multiSelect':
+        components = [createSelectMenu(nextQuestion)]
+        break
+    }
+
+    await channel.send({
+      content: nextQuestion.question,
+      components,
+    })
+  }
+}
+
+async function showSummary(channel, userData) {
+  const responsesSummary = Object.entries(userData.responses)
+    .map(
+      ([key, value]) =>
+        `**${key.charAt(0).toUpperCase() + key.slice(1)}**: ${value}`
+    )
+    .join('\n')
+
+  const updateComponents = []
+
+  // Add update buttons/menus one at a time
+  for (const q of questions) {
+    if (q.type === 'modal') {
+      updateComponents.push(
+        createQuestionButton(
+          `${q.id}-question`,
+          `Update ${q.modalTitle}`,
+          ButtonStyle.Secondary
+        )
+      )
+    } else {
+      updateComponents.push(
+        createSelectMenu({
+          ...q,
+          id: `${q.id}-update`,
+        })
+      )
+    }
+  }
+
+  // Add submit button as the last component
+  updateComponents.push(
+    createQuestionButton('submit-form', 'Submit Form', ButtonStyle.Success)
+  )
+
+  await channel.send({
+    content: `Here's your information:\n${responsesSummary}\n\nWould you like to update anything?`,
+    components: updateComponents,
+  })
+}
+
+module.exports = {
+  sendNextQuestion,
+  handleModalSubmission,
+  handleSelectMenuInteraction,
+  showSummary,
+}

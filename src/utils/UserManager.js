@@ -1,6 +1,7 @@
 // utils/UserManager.js
 const { questions } = require('../questions')
 
+// utils/UserManager.js
 class UserData {
   constructor(channelId) {
     this.channelId = channelId
@@ -8,16 +9,29 @@ class UserData {
     this.responses = {}
     this.hasUpdatedResponse = false
     this.isNewResponse = true
+    this.selectedOptions = new Map() // For storing select menu choices
   }
 
-  updateResponse(questionId, response) {
+  updateResponse(questionId, response, type = 'modal') {
     this.isNewResponse = !this.responses[questionId]
     this.hasUpdatedResponse = !this.isNewResponse
-    this.responses[questionId] = response
+
+    if (type === 'select' || type === 'multiSelect') {
+      this.selectedOptions.set(questionId, response)
+      this.responses[questionId] = Array.isArray(response)
+        ? response.join(', ')
+        : response
+    } else {
+      this.responses[questionId] = response
+    }
 
     if (this.isNewResponse) {
       this.currentQuestion += 1
     }
+  }
+
+  getSelectedOptions(questionId) {
+    return this.selectedOptions.get(questionId)
   }
 
   isComplete() {
@@ -41,10 +55,10 @@ class UserManager {
     return this.users.get(userId)
   }
 
-  updateUserResponse(userId, questionId, response) {
+  updateUserResponse(userId, questionId, response, type = 'modal') {
     const userData = this.getUser(userId)
     if (userData) {
-      userData.updateResponse(questionId, response)
+      userData.updateResponse(questionId, response, type)
       return userData
     }
     return null
