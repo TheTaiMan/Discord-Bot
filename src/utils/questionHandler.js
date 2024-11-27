@@ -7,41 +7,6 @@ const {
   ButtonBuilder,
 } = require('discord.js')
 
-async function handleSelectMenuInteraction(interaction) {
-  // Remove both '-select' and '-update' from the ID to get the base questionId
-  const questionId = interaction.customId
-    .replace(/-select$/, '')
-    .replace(/-update$/, '')
-  const values = interaction.values
-  const question = questions.find((q) => q.id === questionId)
-
-  const userData = UserManager.getUser(interaction.user.id)
-  if (!userData || !question) return
-
-  userData.updateResponse(questionId, values, question.type)
-
-  const responseText = Array.isArray(values)
-    ? values
-        .map((v) => question.options.find((opt) => opt.value === v).label)
-        .join(', ')
-    : question.options.find((opt) => opt.value === values).label
-
-  await interaction.reply({
-    content: `Your ${questionId} has been ${
-      userData.isNewResponse ? 'recorded' : 'updated'
-    } to: "${responseText}"`,
-    ephemeral: true,
-  })
-
-  const channel = await interaction.client.channels.fetch(userData.channelId)
-
-  if (userData.hasUpdatedResponse && userData.isComplete()) {
-    await showSummary(channel, userData)
-  } else if (!userData.hasUpdatedResponse) {
-    await sendNextQuestion(channel, userData)
-  }
-}
-
 async function sendNextQuestion(channel, userData) {
   const nextQuestion = questions[userData.currentQuestion]
 
@@ -165,6 +130,5 @@ async function showSummary(channel, userData) {
 
 module.exports = {
   sendNextQuestion,
-  handleSelectMenuInteraction,
   showSummary,
 }

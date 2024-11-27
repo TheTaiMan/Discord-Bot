@@ -4,7 +4,7 @@ const handleSubmit = require('./interactions/handleSubmit')
 const handleSkipButton = require('./interactions/handleSkipButton')
 const handleModalSubmission = require('./interactions/handleModalSubmission')
 
-const { handleSelectMenuInteraction } = require('../utils/questionHandler')
+const handleSelectMenu = require('./interactions/handleSelectMenu')
 
 module.exports = {
   name: 'interactionCreate',
@@ -29,7 +29,7 @@ module.exports = {
 
     // Handling submit button for the user data
     if (interaction.isStringSelectMenu()) {
-      await handleSelectMenuInteraction(interaction)
+      await handleSelectMenu(interaction)
     }
   },
 }
