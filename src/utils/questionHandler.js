@@ -79,6 +79,7 @@ async function sendNextQuestion(channel, userData) {
     await showSummary(channel, userData)
   } else {
     let components = []
+
     switch (nextQuestion.type) {
       case 'modal':
         const buttonRow = new ActionRowBuilder().addComponents(
@@ -110,6 +111,15 @@ async function sendNextQuestion(channel, userData) {
         const selectRow = new ActionRowBuilder().addComponents(selectMenu)
         components.push(selectRow)
         break
+    }
+
+    // Add skip button for non-required questions
+    if (!nextQuestion.required) {
+      const skipButton = new ButtonBuilder()
+        .setCustomId(`skip-${nextQuestion.id}`)
+        .setLabel('Skip')
+        .setStyle(ButtonStyle.Danger)
+      components.push(new ActionRowBuilder().addComponents(skipButton))
     }
 
     await channel.send({

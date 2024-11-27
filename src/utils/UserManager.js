@@ -64,6 +64,14 @@ class UserManager {
     return null
   }
 
+  skipQuestion(userId, questionId) {
+    const user = this.users.get(userId)
+    if (user) {
+      user.responses[questionId] = 'Skipped'
+      user.currentQuestion++
+    }
+  }
+
   printUserData(userId) {
     const userData = this.getUser(userId)
     if (userData) {
