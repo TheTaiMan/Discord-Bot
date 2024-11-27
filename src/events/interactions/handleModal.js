@@ -18,4 +18,4 @@ const handleModal = async (interaction) => {
   }
 }
 
-module.exports = { handleModal }
+module.exports =  handleModal 

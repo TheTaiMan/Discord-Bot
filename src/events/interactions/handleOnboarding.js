@@ -43,4 +43,4 @@ const handleOnboarding = async (interaction) => {
   }
 }
 
-module.exports = { handleOnboarding }
+module.exports =  handleOnboarding 

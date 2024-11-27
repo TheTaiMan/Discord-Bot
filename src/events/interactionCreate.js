@@ -8,25 +8,11 @@ const {
   handleSelectMenuInteraction,
 } = require('../utils/questionHandler')
 
-const { handleOnboarding } = require('./interactions/handleOnboarding')
-const { handleModal } = require('./interactions/handleModal')
+const handleOnboarding = require('./interactions/handleOnboarding')
+const handleModal = require('./interactions/handleModal')
+const handleSubmit = require('./interactions/handleSubmit')
 
 const { ButtonBuilder, ActionRowBuilder } = require('discord.js')
-
-const handleSubmit = async (interaction) => {
-  const userData = UserManager.getUser(interaction.user.id)
-  if (userData) {
-    await interaction.update({
-      content:
-        'Form submitted successfully! Your responses are being reviewed.',
-      components: [],
-    })
-    // ! Prints the user data
-    UserManager.printUserData(interaction.user.id)
-
-    UserManager.removeUser(interaction.user.id)
-  }
-}
 
 async function handleSkipButton(interaction) {
   const questionId = interaction.customId.replace('skip-', '')
