@@ -2,11 +2,9 @@ const handleOnboarding = require('./interactions/handleOnboarding')
 const handleModal = require('./interactions/handleModal')
 const handleSubmit = require('./interactions/handleSubmit')
 const handleSkipButton = require('./interactions/handleSkipButton')
+const handleModalSubmission = require('./interactions/handleModalSubmission')
 
-const {
-  handleModalSubmission,
-  handleSelectMenuInteraction,
-} = require('../utils/questionHandler')
+const { handleSelectMenuInteraction } = require('../utils/questionHandler')
 
 module.exports = {
   name: 'interactionCreate',

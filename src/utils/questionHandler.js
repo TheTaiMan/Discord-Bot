@@ -7,36 +7,6 @@ const {
   ButtonBuilder,
 } = require('discord.js')
 
-async function handleModalSubmission(interaction) {
-  const questionId = interaction.customId.replace('-modal', '')
-  const response = interaction.fields.getTextInputValue(
-    `${questionId}-modal-input`
-  )
-
-  const userData = UserManager.updateUserResponse(
-    interaction.user.id,
-    questionId,
-    response,
-    'modal'
-  )
-  if (!userData) return
-
-  const channel = await interaction.client.channels.fetch(userData.channelId)
-
-  await interaction.reply({
-    content: `Your ${questionId} has been ${
-      userData.isNewResponse ? 'recorded' : 'updated'
-    } to: "${response}"`,
-    ephemeral: true,
-  })
-
-  if (userData.hasUpdatedResponse && userData.isComplete()) {
-    await showSummary(channel, userData)
-  } else if (!userData.hasUpdatedResponse) {
-    await sendNextQuestion(channel, userData)
-  }
-}
-
 async function handleSelectMenuInteraction(interaction) {
   // Remove both '-select' and '-update' from the ID to get the base questionId
   const questionId = interaction.customId
@@ -195,7 +165,6 @@ async function showSummary(channel, userData) {
 
 module.exports = {
   sendNextQuestion,
-  handleModalSubmission,
   handleSelectMenuInteraction,
   showSummary,
 }
