@@ -1,8 +1,4 @@
-const {
-  createQuestionButton,
-  createSelectMenu,
-  ButtonStyle,
-} = require('./modalBuilder')
+const { ButtonStyle } = require('./modalBuilder')
 const UserManager = require('./UserManager')
 const { questions } = require('../questions')
 const {
@@ -148,7 +144,7 @@ async function showSummary(channel, userData) {
       // Create select menu for select/multiSelect questions
       const selectMenu = new StringSelectMenuBuilder()
         .setCustomId(`${q.id}-update-select`)
-        .setPlaceholder(`Update your ${q.question.toLowerCase()}`)
+        .setPlaceholder(`Update your ${q.id.toLowerCase()}`)
         .addOptions(
           q.options.map((opt) => ({
             label: opt.label,

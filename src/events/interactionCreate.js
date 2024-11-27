@@ -49,7 +49,7 @@ const handleOnboarding = async (interaction) => {
   }
 }
 
-// Handles question button press
+// Handles modal button press
 const handleForm = async (interaction) => {
   const questionId = interaction.customId.replace('-question', '')
   const question = questions.find((q) => q.id === questionId)
