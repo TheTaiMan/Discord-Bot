@@ -1,23 +1,17 @@
-const { createQuestionModal } = require('../utils/modalBuilder')
-const { questions } = require('../questions')
-const UserManager = require('../utils/UserManager')
-const { createPrivateChannel } = require('../utils/channelManager')
-const {
-  sendNextQuestion,
-  handleModalSubmission,
-  handleSelectMenuInteraction,
-} = require('../utils/questionHandler')
-
 const handleOnboarding = require('./interactions/handleOnboarding')
 const handleModal = require('./interactions/handleModal')
 const handleSubmit = require('./interactions/handleSubmit')
 const handleSkipButton = require('./interactions/handleSkipButton')
 
-const { ButtonBuilder, ActionRowBuilder } = require('discord.js')
+const {
+  handleModalSubmission,
+  handleSelectMenuInteraction,
+} = require('../utils/questionHandler')
 
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
+    // Handling Button Interactions
     if (interaction.isButton()) {
       if (interaction.customId === 'submit-form') {
         await handleSubmit(interaction)
@@ -30,10 +24,12 @@ module.exports = {
       }
     }
 
+    // Handling model submit button
     if (interaction.isModalSubmit()) {
       await handleModalSubmission(interaction)
     }
 
+    // Handling submit button for the user data
     if (interaction.isStringSelectMenu()) {
       await handleSelectMenuInteraction(interaction)
     }
