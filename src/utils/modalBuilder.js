@@ -15,6 +15,7 @@ function createQuestionModal(
   label,
   placeholder,
   inputStyle,
+  required,
   minLength = 1,
   maxLength = 100
 ) {
@@ -27,7 +28,7 @@ function createQuestionModal(
     .setMinLength(minLength)
     .setMaxLength(maxLength)
     .setPlaceholder(placeholder)
-    .setRequired(true)
+    .setRequired(required)
 
   modal.addComponents(new ActionRowBuilder().addComponents(input))
   return modal

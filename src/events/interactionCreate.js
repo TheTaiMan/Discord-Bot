@@ -9,25 +9,9 @@ const {
 } = require('../utils/questionHandler')
 
 const { handleOnboarding } = require('./interactions/handleOnboarding')
+const { handleModal } = require('./interactions/handleModal')
 
 const { ButtonBuilder, ActionRowBuilder } = require('discord.js')
-
-
-// Handles modal button press
-const handleForm = async (interaction) => {
-  const questionId = interaction.customId.replace('-question', '')
-  const question = questions.find((q) => q.id === questionId)
-  if (question) {
-    const modal = createQuestionModal(
-      `${questionId}-modal`,
-      question.modalTitle,
-      question.modalLabel,
-      question.placeholder,
-      question.inputStyle
-    )
-    await interaction.showModal(modal)
-  }
-}
 
 const handleSubmit = async (interaction) => {
   const userData = UserManager.getUser(interaction.user.id)
@@ -83,7 +67,7 @@ module.exports = {
       } else if (interaction.customId.startsWith('skip-')) {
         await handleSkipButton(interaction)
       } else if (interaction.customId.endsWith('-question')) {
-        await handleForm(interaction)
+        await handleModal(interaction)
       }
     }
 

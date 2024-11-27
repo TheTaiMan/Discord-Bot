@@ -21,7 +21,7 @@ const questions = [
     modalLabel: 'What is your student email address?',
     placeholder: 'student@university.edu',
     inputStyle: 'Short',
-    required: true,
+    required: false,
   },
   {
     id: 'year',
