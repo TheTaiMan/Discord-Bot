@@ -1,4 +1,4 @@
-const { createModal } = require('../utils/modalBuilder')
+const createModal = require('../components/createModal')
 const { questions } = require('../questions')
 
 // Handles modal button press
@@ -18,4 +18,4 @@ const handleModal = async (interaction) => {
   }
 }
 
-module.exports =  handleModal 
+module.exports = handleModal
