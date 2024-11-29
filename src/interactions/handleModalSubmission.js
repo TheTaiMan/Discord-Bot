@@ -1,37 +1,36 @@
-const { showSummary, sendNextQuestion } = require('../../utils/questionHandler')
-const UserManager = require('../../utils/UserManager')
+const { showSummary, sendNextQuestion } = require('../utils/questionHandler')
+const UserManager = require('../utils/UserManager')
 const { ActionRowBuilder } = require('discord.js')
-const { questions } = require('../../questions')
+const { questions } = require('../questions')
 
-const handleSelectMenu = async (interaction) => {
-  const questionId = interaction.customId
-    .replace(/-select$/, '')
-    .replace(/-update$/, '')
+const handleModalSubmission = async (interaction) => {
+  const questionId = interaction.customId.replace('-modal', '')
+  const response = interaction.fields.getTextInputValue(
+    `${questionId}-modal-input`
+  )
 
-  const values = interaction.values
   const question = questions.find((q) => q.id === questionId)
 
-  const userData = UserManager.getUser(interaction.user.id)
-  if (!userData || !question) return
+  const userData = UserManager.updateUserResponse(
+    interaction.user.id,
+    questionId,
+    response,
+    'modal'
+  )
+  if (!userData) return
 
-  userData.updateResponse(questionId, values, question.type)
+  const channel = await interaction.client.channels.fetch(userData.channelId)
 
-  const responseText = Array.isArray(values)
-    ? values
-        .map((v) => question.options.find((opt) => opt.value === v).label)
-        .join(', ')
-    : question.options.find((opt) => opt.value === values).label
+  // Find the most recent message in the channel
+  const messages = await channel.messages.fetch({ limit: 1 })
+  const latestMessage = messages.first()
 
   await interaction.reply({
     content: `Your ${questionId} has been ${
       userData.isNewResponse ? 'recorded' : 'updated'
-    } to: "${responseText}"`,
+    } to: "${response}"`,
     ephemeral: true,
   })
-
-  const channel = await interaction.client.channels.fetch(userData.channelId)
-  const messages = await channel.messages.fetch({ limit: 1 })
-  const latestMessage = messages.first()
 
   // Specifically check if this question is NOT required
   if (question && !question.required) {
@@ -63,4 +62,4 @@ const handleSelectMenu = async (interaction) => {
   }
 }
 
-module.exports = handleSelectMenu
+module.exports = handleModalSubmission

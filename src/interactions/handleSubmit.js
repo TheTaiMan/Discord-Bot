@@ -1,4 +1,4 @@
-const UserManager = require('../../utils/UserManager')
+const UserManager = require('../utils/UserManager')
 
 const handleSubmit = async (interaction) => {
   const userData = UserManager.getUser(interaction.user.id)

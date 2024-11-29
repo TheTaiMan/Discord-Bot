@@ -1,6 +1,6 @@
-const UserManager = require('../../utils/UserManager')
-const { createPrivateChannel } = require('../../utils/channelManager')
-const { sendNextQuestion } = require('../../utils/questionHandler')
+const UserManager = require('../utils/UserManager')
+const { createPrivateChannel } = require('../utils/channelManager')
+const { sendNextQuestion } = require('../utils/questionHandler')
 
 // Handles the On Boarding Button press 
 const handleOnboarding = async (interaction) => {

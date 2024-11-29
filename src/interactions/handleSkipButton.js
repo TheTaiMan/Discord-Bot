@@ -1,6 +1,6 @@
 const { ButtonBuilder, ActionRowBuilder } = require('discord.js')
-const UserManager = require('../../utils/UserManager')
-const { sendNextQuestion } = require('../../utils/questionHandler')
+const UserManager = require('../utils/UserManager')
+const { sendNextQuestion } = require('../utils/questionHandler')
 
 const handleSkipButton = async (interaction) => {
   const questionId = interaction.customId.replace('skip-', '')
