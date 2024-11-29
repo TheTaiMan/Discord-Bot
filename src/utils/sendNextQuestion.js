@@ -1,8 +1,8 @@
 const { questions } = require('../questions')
 const showSummary = require('./showSummery')
-const createSelectMenu = require('./createSelectMenu')
-const createModalButton = require('./createModalButton')
-const createSkipButton = require('./createSkipButton')
+const createSelectMenu = require('../components/createSelectMenu')
+const createModalButton = require('../components/createModalButton')
+const createSkipButton = require('../components/createSkipButton')
 
 async function sendNextQuestion(channel, userData) {
   const nextQuestion = questions[userData.currentQuestion]

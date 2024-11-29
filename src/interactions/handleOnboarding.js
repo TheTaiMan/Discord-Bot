@@ -1,6 +1,6 @@
 const UserManager = require('../UserManager')
 const createChannel = require('../components/createChannel')
-const sendNextQuestion = require('../components/sendNextQuestion')
+const sendNextQuestion = require('../utils/sendNextQuestion')
 
 
 // Handles the On Boarding Button press

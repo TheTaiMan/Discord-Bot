@@ -1,7 +1,7 @@
 const { questions } = require('../questions')
-const createUpdateComponents = require('./createUpdateComponents')
-const createSubmitButton = require('./createSubmitButton')
-const formatResponseSummary = require('../utils/formatResponseSummary')
+const createUpdateComponents = require('../components/createUpdateComponents')
+const createSubmitButton = require('../components/createSubmitButton')
+const formatResponseSummary = require('./formatResponseSummary')
 
 const showSummary = async (channel, userData) => {
   const responsesSummary = formatResponseSummary(userData.responses)

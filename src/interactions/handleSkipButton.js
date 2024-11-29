@@ -1,6 +1,6 @@
 const { ButtonBuilder, ActionRowBuilder } = require('discord.js')
 const UserManager = require('../UserManager')
-const sendNextQuestion = require('../components/sendNextQuestion')
+const sendNextQuestion = require('../utils/sendNextQuestion')
 
 
 const handleSkipButton = async (interaction) => {

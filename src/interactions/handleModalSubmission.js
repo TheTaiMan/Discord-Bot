@@ -1,5 +1,5 @@
-const showSummary = require('../components/showSummery')
-const sendNextQuestion = require('../components/sendNextQuestion')
+const showSummary = require('../utils/showSummery')
+const sendNextQuestion = require('../utils/sendNextQuestion')
 
 const UserManager = require('../UserManager')
 const { ActionRowBuilder } = require('discord.js')
