@@ -1,5 +1,5 @@
 const { ButtonBuilder, ActionRowBuilder } = require('discord.js')
-const UserManager = require('../utils/UserManager')
+const UserManager = require('../UserManager')
 const sendNextQuestion = require('../components/sendNextQuestion')
 
 

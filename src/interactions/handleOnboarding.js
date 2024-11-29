@@ -1,4 +1,4 @@
-const UserManager = require('../utils/UserManager')
+const UserManager = require('../UserManager')
 const createChannel = require('../components/createChannel')
 const sendNextQuestion = require('../components/sendNextQuestion')
 

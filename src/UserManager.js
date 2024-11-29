@@ -1,5 +1,5 @@
 // utils/UserManager.js
-const { questions } = require('../questions')
+const { questions } = require('./questions')
 
 // utils/UserManager.js
 class UserData {
