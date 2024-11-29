@@ -1,5 +1,6 @@
 const UserManager = require('../UserManager')
 const { addUserToNotion } = require('../notion/client')
+const selfDestruct = require('../utils/selfDestruct')
 
 const handleSubmit = async (interaction) => {
   const userData = UserManager.getUser(interaction.user.id)
@@ -8,6 +9,7 @@ const handleSubmit = async (interaction) => {
     try {
       const notionPageId = await addUserToNotion(userData, interaction.user)
 
+      // Update interaction with success message
       await interaction.update({
         content:
           'Form submitted successfully! Your responses are being reviewed.',
@@ -16,6 +18,9 @@ const handleSubmit = async (interaction) => {
 
       UserManager.printUserData(interaction.user.id)
       UserManager.removeUser(interaction.user.id)
+
+      // Self-destruct the current channel
+      await selfDestruct(interaction.channel)
     } catch (error) {
       console.error('Error submitting form:', error)
       await interaction.update({
