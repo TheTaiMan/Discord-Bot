@@ -6,6 +6,8 @@ const handleSubmit = async (interaction) => {
 
   if (userData) {
     try {
+      const notionPageId = await addUserToNotion(userData, interaction.user)
+
       await interaction.update({
         content:
           'Form submitted successfully! Your responses are being reviewed.',

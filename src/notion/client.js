@@ -1,6 +1,36 @@
 const { Client } = require('@notionhq/client')
+const { questions } = require('../questions')
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY })
+
+function convertOptionsToNotion(questionId, values, type = 'multiSelect') {
+  if (!values) return type === 'multiSelect' ? [] : null
+
+  // Ensure values is an array, even for single select
+  const valuesArray =
+    type === 'select'
+      ? [values]
+      : Array.isArray(values)
+      ? values
+      : values.split(', ')
+
+  const question = questions.find((q) => q.id === questionId)
+  if (!question || !question.options) return type === 'multiSelect' ? [] : null
+
+  // For multi-select, return an array of objects with labels
+  if (type === 'multiSelect') {
+    return valuesArray.map((value) => {
+      const option = question.options.find((opt) => opt.value === value.trim())
+      return {
+        name: option ? option.label : value.trim(),
+      }
+    })
+  }
+
+  // For single select, find the matching label
+  const option = question.options.find((opt) => opt.value === valuesArray[0])
+  return option ? { name: option.label } : null
+}
 
 async function addUserToNotion(userData, discordUser) {
   try {
@@ -20,12 +50,17 @@ async function addUserToNotion(userData, discordUser) {
           email: userData.responses.email || '',
         },
         Year: {
-          select: {
-            name: convertYearValue(userData.responses.year),
-          },
+          select: convertOptionsToNotion(
+            'year',
+            userData.responses.year,
+            'select'
+          ),
         },
         Interests: {
-          multi_select: convertInterests(userData.responses.interests || []),
+          multi_select: convertOptionsToNotion(
+            'interests',
+            userData.responses.interests
+          ),
         },
         'Discord Username': {
           rich_text: [
@@ -48,24 +83,6 @@ async function addUserToNotion(userData, discordUser) {
     console.error('Error adding user to Notion:', error)
     throw error
   }
-}
-
-function convertYearValue(year) {
-  const yearMap = {
-    1: 'First Year',
-    2: 'Second Year',
-    3: 'Third Year',
-    4: 'Fourth Year',
-    grad: 'Graduate Student',
-  }
-  return yearMap[year] || 'Not Specified'
-}
-
-function convertInterests(interests) {
-  if (!Array.isArray(interests)) return []
-  return interests.map((interest) => ({
-    name: interest,
-  }))
 }
 
 module.exports = { addUserToNotion }
