@@ -3,8 +3,6 @@ const {
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } = require('discord.js')
@@ -55,9 +53,7 @@ function createSelectMenu(question) {
   return new ActionRowBuilder().addComponents(select)
 }
 
-
 module.exports = {
   createModal,
   createSelectMenu, // Make sure this is exported
-  ButtonStyle,
 }

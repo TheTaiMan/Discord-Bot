@@ -1,10 +1,10 @@
-const { ButtonStyle } = require('./modalBuilder')
 const UserManager = require('./UserManager')
 const { questions } = require('../questions')
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
   ButtonBuilder,
+  ButtonStyle,
 } = require('discord.js')
 
 async function sendNextQuestion(channel, userData) {
