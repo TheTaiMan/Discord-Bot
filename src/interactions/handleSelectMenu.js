@@ -1,4 +1,5 @@
-const { showSummary, sendNextQuestion } = require('../utils/questionHandler')
+const showSummary = require('../components/showSummery')
+const { sendNextQuestion } = require('../utils/questionHandler')
 const UserManager = require('../utils/UserManager')
 const { ActionRowBuilder } = require('discord.js')
 const { questions } = require('../questions')
