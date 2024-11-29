@@ -1,4 +1,3 @@
-const UserManager = require('./UserManager')
 const { questions } = require('../questions')
 const {
   ActionRowBuilder,
