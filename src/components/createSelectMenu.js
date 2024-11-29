@@ -7,7 +7,7 @@ const {
 function createSelectMenu(question) {
   const select = new StringSelectMenuBuilder()
     .setCustomId(`${question.id}-select`)
-    .setPlaceholder('Make a selection')
+    .setPlaceholder(question.placeholder || 'Make a selection')
     .addOptions(
       question.options.map((opt) =>
         new StringSelectMenuOptionBuilder()

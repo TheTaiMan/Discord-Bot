@@ -1,67 +1,42 @@
-const {
-  ActionRowBuilder,
-  StringSelectMenuBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-} = require('discord.js')
-const showSummary = require('./showSummery')
 const { questions } = require('../questions')
+const showSummary = require('./showSummery')
+const createSelectMenu = require('./createSelectMenu')
+const createModalButton = require('./createModalButton')
+const createSkipButton = require('./createSkipButton')
 
 async function sendNextQuestion(channel, userData) {
   const nextQuestion = questions[userData.currentQuestion]
 
   if (userData.isComplete()) {
-    await showSummary(channel, userData)
-  } else {
-    let components = []
-
-    switch (nextQuestion.type) {
-      case 'modal':
-        const buttonRow = new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId(`${nextQuestion.id}-question`)
-            .setLabel(nextQuestion.buttonLabel)
-            .setStyle(ButtonStyle.Primary)
-        )
-        components.push(buttonRow)
-        break
-      case 'select':
-      case 'multiSelect':
-        const selectMenu = new StringSelectMenuBuilder()
-          .setCustomId(`${nextQuestion.id}-select`)
-          .setPlaceholder(nextQuestion.placeholder || 'Make a selection')
-          .addOptions(
-            nextQuestion.options.map((opt) => ({
-              label: opt.label,
-              value: opt.value,
-            }))
-          )
-
-        if (nextQuestion.type === 'multiSelect') {
-          selectMenu
-            .setMinValues(nextQuestion.minValues || 1)
-            .setMaxValues(nextQuestion.maxValues || nextQuestion.options.length)
-        }
-
-        const selectRow = new ActionRowBuilder().addComponents(selectMenu)
-        components.push(selectRow)
-        break
-    }
-
-    // Add skip button for non-required questions
-    if (!nextQuestion.required) {
-      const skipButton = new ButtonBuilder()
-        .setCustomId(`skip-${nextQuestion.id}`)
-        .setLabel('Skip')
-        .setStyle(ButtonStyle.Danger)
-      components.push(new ActionRowBuilder().addComponents(skipButton))
-    }
-
-    await channel.send({
-      content: nextQuestion.question,
-      components,
-    })
+    return await showSummary(channel, userData)
   }
+
+  const components = await buildQuestionComponents(nextQuestion)
+
+  await channel.send({
+    content: nextQuestion.question,
+    components,
+  })
+}
+
+async function buildQuestionComponents(question) {
+  const components = []
+
+  switch (question.type) {
+    case 'modal':
+      components.push(createModalButton(question))
+      break
+    case 'select':
+    case 'multiSelect':
+      components.push(createSelectMenu(question))
+      break
+  }
+
+  if (!question.required) {
+    components.push(createSkipButton(question))
+  }
+
+  return components
 }
 
 module.exports = sendNextQuestion
