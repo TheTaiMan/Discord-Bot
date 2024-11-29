@@ -55,18 +55,9 @@ function createSelectMenu(question) {
   return new ActionRowBuilder().addComponents(select)
 }
 
-function createQuestionButton(customId, label, buttonStyle) {
-  return new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(customId)
-      .setLabel(label)
-      .setStyle(buttonStyle)
-  )
-}
 
 module.exports = {
   createModal,
   createSelectMenu, // Make sure this is exported
-  createQuestionButton,
   ButtonStyle,
 }
