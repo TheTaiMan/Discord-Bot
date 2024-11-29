@@ -1,6 +1,7 @@
 const UserManager = require('../utils/UserManager')
 const createChannel = require('../components/createChannel')
-const { sendNextQuestion } = require('../utils/questionHandler')
+const sendNextQuestion = require('../components/sendNextQuestion')
+
 
 // Handles the On Boarding Button press
 const handleOnboarding = async (interaction) => {

@@ -1,11 +1,11 @@
-const { questions } = require('../questions')
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
   ButtonBuilder,
   ButtonStyle,
 } = require('discord.js')
-const showSummary = require('../components/showSummery')
+const showSummary = require('./showSummery')
+const { questions } = require('../questions')
 
 async function sendNextQuestion(channel, userData) {
   const nextQuestion = questions[userData.currentQuestion]
@@ -64,6 +64,4 @@ async function sendNextQuestion(channel, userData) {
   }
 }
 
-module.exports = {
-  sendNextQuestion,
-}
+module.exports = sendNextQuestion
