@@ -9,7 +9,7 @@ const {
   StringSelectMenuOptionBuilder,
 } = require('discord.js')
 
-function createQuestionModal(
+function createModal(
   customId,
   title,
   label,
@@ -65,7 +65,7 @@ function createQuestionButton(customId, label, buttonStyle) {
 }
 
 module.exports = {
-  createQuestionModal,
+  createModal,
   createSelectMenu, // Make sure this is exported
   createQuestionButton,
   ButtonStyle,
