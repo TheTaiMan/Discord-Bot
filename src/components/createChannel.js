@@ -1,7 +1,7 @@
 const { ChannelType, PermissionFlagsBits } = require('discord.js')
 
 // Returns the channel property
-async function createPrivateChannel(interaction) {
+const createChannel = async (interaction) => {
   return await interaction.guild.channels.create({
     name: `onboarding-${interaction.user.id}`,
     type: ChannelType.GuildText,
@@ -35,4 +35,4 @@ async function createPrivateChannel(interaction) {
   })
 }
 
-module.exports = { createPrivateChannel }
+module.exports = createChannel

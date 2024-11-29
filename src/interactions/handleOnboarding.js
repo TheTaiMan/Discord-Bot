@@ -1,8 +1,8 @@
 const UserManager = require('../utils/UserManager')
-const { createPrivateChannel } = require('../utils/channelManager')
+const createChannel = require('../components/createChannel')
 const { sendNextQuestion } = require('../utils/questionHandler')
 
-// Handles the On Boarding Button press 
+// Handles the On Boarding Button press
 const handleOnboarding = async (interaction) => {
   try {
     // Check if a channel already exists for this user
@@ -20,7 +20,7 @@ const handleOnboarding = async (interaction) => {
     }
 
     // If no channel exists, create a new one
-    const channel = await createPrivateChannel(interaction)
+    const channel = await createChannel(interaction)
     const userData = UserManager.createUser(interaction.user.id, channel.id)
 
     // Welcome Message
@@ -43,4 +43,4 @@ const handleOnboarding = async (interaction) => {
   }
 }
 
-module.exports =  handleOnboarding 
+module.exports = handleOnboarding

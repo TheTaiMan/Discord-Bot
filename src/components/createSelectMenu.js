@@ -25,6 +25,4 @@ function createSelectMenu(question) {
   return new ActionRowBuilder().addComponents(select)
 }
 
-module.exports = {
-  createSelectMenu, // Make sure this is exported
-}
+module.exports = createSelectMenu
