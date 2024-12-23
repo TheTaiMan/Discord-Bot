@@ -9,26 +9,25 @@ const handleSelectMenu = require('../interactions/handleSelectMenu')
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction) {
-    // Handling Button Interactions
     if (interaction.isButton()) {
-      if (interaction.customId === 'start-onboarding') {
-        await handleOnboarding(interaction)
-      } else if (interaction.customId.endsWith('-question')) {
-        await handleModal(interaction)
-      } else if (interaction.customId.startsWith('skip-')) {
-        await handleSkipButton(interaction)
-      } else if (interaction.customId === 'submit-form') {
-        await handleSubmit(interaction)
-      }
-    }
-    // Handling model submit button
-    if (interaction.isModalSubmit()) {
-      await handleModalSubmission(interaction)
-    }
-
-    // Handling submit button for the user data
-    if (interaction.isStringSelectMenu()) {
-      await handleSelectMenu(interaction)
+      await handleButtonInteraction(interaction);
+    } else if (interaction.isModalSubmit()) {
+      await handleModalSubmission(interaction);
+    } else if (interaction.isStringSelectMenu()) {
+      await handleSelectMenu(interaction);
     }
   },
+}
+
+async function handleButtonInteraction(interaction) {
+  const { customId } = interaction;
+  if (customId === 'start-onboarding') {
+    await handleOnboarding(interaction);
+  } else if (customId.endsWith('-question')) {
+    await handleModal(interaction);
+  } else if (customId.startsWith('skip-')) {
+    await handleSkipButton(interaction);
+  } else if (customId === 'submit-form') {
+    await handleSubmit(interaction);
+  }
 }
