@@ -5,7 +5,11 @@ const formatResponseSummary = require('./formatResponseSummary')
 
 const showSummary = async (channel, userData) => {
   const responsesSummary = formatResponseSummary(userData.responses)
-  const updateComponents = await createUpdateComponents(questions)
+
+  // Filter questions based on the 'update' property
+  const updateQuestions = questions.filter((question) => question.update)
+
+  const updateComponents = await createUpdateComponents(updateQuestions)
   const submitRow = createSubmitButton()
 
   const components = [...updateComponents, submitRow].slice(0, 5)

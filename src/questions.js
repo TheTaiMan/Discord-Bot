@@ -11,6 +11,7 @@ const questions = [
     placeholder: 'John Joe',
     inputStyle: 'Short',
     required: true,
+    update: true,
   },
   {
     id: 'email',
@@ -22,6 +23,7 @@ const questions = [
     placeholder: 'student@university.edu',
     inputStyle: 'Short',
     required: true,
+    update: true,
   },
   {
     id: 'year',
@@ -36,6 +38,7 @@ const questions = [
       { label: 'Graduate Student', value: 'grad' },
     ],
     required: false,
+    update: false,
   },
   {
     id: 'interests',
@@ -52,6 +55,7 @@ const questions = [
     minValues: 1,
     maxValues: 3,
     required: false,
+    update: false,
   },
 ]
 
