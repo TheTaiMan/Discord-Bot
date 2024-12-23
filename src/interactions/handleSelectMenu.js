@@ -2,8 +2,8 @@ const showSummary = require('../utils/showSummery')
 const sendNextQuestion = require('../utils/sendNextQuestion')
 
 const UserManager = require('../UserManager')
-const { ActionRowBuilder } = require('discord.js')
 const { questions } = require('../questions')
+const removeSkipButton = require('../utils/removeSkipButton')
 
 const handleSelectMenu = async (interaction) => {
   const questionId = interaction.customId
@@ -41,25 +41,7 @@ const handleSelectMenu = async (interaction) => {
     !question.required &&
     userData.currentQuestion < questions.length
   ) {
-    // Ensure the message has components and they're not empty
-    if (latestMessage.components && latestMessage.components.length > 0) {
-      // Create a new action row without the skip button
-      const updatedComponents = latestMessage.components[0].components.filter(
-        (component) => !component.customId.startsWith('skip-')
-      )
-
-      // If there are still components, create a new ActionRow
-      if (updatedComponents.length > 0) {
-        await latestMessage.edit({
-          components: [
-            new ActionRowBuilder().addComponents(...updatedComponents),
-          ],
-        })
-      } else {
-        // If no components remain, clear them completely
-        await latestMessage.edit({ components: [] })
-      }
-    }
+    await removeSkipButton(latestMessage)
   }
 
   if (userData.hasUpdatedResponse && userData.isComplete()) {
