@@ -10,6 +10,7 @@ class UserData {
     this.hasUpdatedResponse = false
     this.isNewResponse = true
     this.selectedOptions = new Map() // For storing select menu choices
+    this.summaryMessageId = null // Add this line to track summary message ID
   }
 
   updateResponse(questionId, response, type = 'modal') {
