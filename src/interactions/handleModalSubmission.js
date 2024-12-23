@@ -34,8 +34,12 @@ const handleModalSubmission = async (interaction) => {
     ephemeral: true,
   })
 
-  // Specifically check if this question is NOT required
-  if (question && !question.required) {
+  // Specifically check if this question is NOT required and it's not the last question
+  if (
+    question &&
+    !question.required &&
+    userData.currentQuestion < questions.length
+  ) {
     // Ensure the message has components and they're not empty
     if (latestMessage.components && latestMessage.components.length > 0) {
       // Create a new action row without the skip button

@@ -10,7 +10,7 @@ const questions = [
     modalLabel: 'What is your full name?',
     placeholder: 'John Joe',
     inputStyle: 'Short',
-    required: true,
+    required: false,
     update: true,
   },
   {
