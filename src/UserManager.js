@@ -1,18 +1,20 @@
 const { questions } = require('./questions')
 
 class UserData {
-  constructor(channelId) {
+  constructor(channelId, userId) {
     this.channelId = channelId
+    this.userId = userId // Store userId
     this.currentQuestion = 0
     this.responses = {}
     this.hasUpdatedResponse = false
     this.isNewResponse = true
-    this.selectedOptions = new Map() // For storing select menu choices
-    this.summaryMessageId = null // Add this line to track summary message ID
-    this.verificationCode = null // Store verification code
-    this.verificationStatus = 'pending' // 'pending', 'sent', 'verified', 'error'
-    this.isVerified = false // Track if the user is verified
-    this.emailForVerification = null; 
+    this.selectedOptions = new Map()
+    this.summaryMessageId = null
+    this.verificationCode = null
+    this.verificationStatus = 'pending'
+    this.isVerified = false
+    this.emailForVerification = null
+    this.verificationInteraction = null
   }
 
   updateResponse(questionId, response, type = 'modal') {
@@ -51,7 +53,7 @@ class UserManager {
   }
 
   createUser(userId, channelId) {
-    const userData = new UserData(channelId)
+    const userData = new UserData(channelId, userId) // Pass userId to UserData
     this.users.set(userId, userData)
     return userData
   }
@@ -86,6 +88,18 @@ class UserManager {
 
   removeUser(userId) {
     this.users.delete(userId)
+  }
+
+  setVerificationInteraction(userId, interaction) {
+    const userData = this.getUser(userId)
+    if (userData) {
+      userData.verificationInteraction = interaction
+    }
+  }
+
+  getVerificationInteraction(userId) {
+    const userData = this.getUser(userId)
+    return userData ? userData.verificationInteraction : null
   }
 }
 

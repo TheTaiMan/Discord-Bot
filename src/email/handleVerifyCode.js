@@ -1,6 +1,5 @@
 const UserManager = require('../UserManager')
 const sendNextQuestion = require('../utils/sendNextQuestion')
-const showSummary = require('../utils/showSummery')
 
 const handleVerifyCode = async (interaction) => {
   const userId = interaction.user.id
