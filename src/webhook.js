@@ -1,8 +1,12 @@
-// webhook.js
 const express = require('express')
 const bodyParser = require('body-parser')
 const UserManager = require('./UserManager') // Import UserManager
-const { Client } = require('discord.js') // Import Discord.js Client
+const {
+  Client,
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder,
+} = require('discord.js') // Import Discord.js Client and components
 
 const app = express()
 app.use(bodyParser.json())
@@ -18,17 +22,16 @@ app.post('/brevo-webhook', async (req, res) => {
   const eventType = brevoEventData.event
   const recipientEmail = brevoEventData.email
 
-  // Find the user data based on the email
+  // Find the user data based on the email intended for verification
   const userDataArray = Array.from(UserManager.users.values()).filter(
-    (userData) => userData.responses.email === recipientEmail
+    (userData) => userData.emailForVerification === recipientEmail
   )
 
   if (userDataArray.length === 0) {
-    console.log(`No user found with email: ${recipientEmail}`)
+    console.log(`No user found with verification email: ${recipientEmail}`)
     return res.sendStatus(200) // Still acknowledge the event
   }
 
-  // Assuming only one user should have this email during onboarding
   const userData = userDataArray[0]
   const channelId = userData.channelId
 
@@ -38,9 +41,11 @@ app.post('/brevo-webhook', async (req, res) => {
     switch (eventType) {
       case 'request':
         await channel.send('Verification email sent.')
+        userData.verificationStatus = 'sent'
         break
       case 'delivered':
         await channel.send('Verification email delivered!')
+        userData.verificationStatus = 'delivered'
         // Proceed to prompt the user to enter the verification code
         const enterCodeButton = new ButtonBuilder()
           .setCustomId('enter-verification-code')
@@ -56,24 +61,29 @@ app.post('/brevo-webhook', async (req, res) => {
         await channel.send(
           `Verification email soft bounced. There might be a temporary issue with the recipient's inbox.`
         )
+        userData.verificationStatus = 'soft_bounce'
         break
       case 'hard_bounce':
         await channel.send(
           `Verification email hard bounced. Please check the email address you entered.`
         )
+        userData.verificationStatus = 'hard_bounce'
         break
       case 'error':
         await channel.send(
           `An error occurred while sending the verification email.`
         )
+        userData.verificationStatus = 'brevo_error'
         break
       case 'deferred':
         await channel.send(
           `Verification email delivery is temporarily deferred.`
         )
+        userData.verificationStatus = 'deferred'
         break
       case 'blocked':
         await channel.send(`Verification email was blocked.`)
+        userData.verificationStatus = 'blocked'
         break
       // Add more cases for other event types if needed
       default:
