@@ -7,7 +7,8 @@ const createSkipButton = require('../components/createSkipButton')
 async function sendNextQuestion(channel, userData) {
   const nextQuestion = questions[userData.currentQuestion]
 
-  if (userData.isComplete()) {
+  if (!nextQuestion) {
+    // If no more questions, show the summary
     return await showSummary(channel, userData)
   }
 

@@ -1,7 +1,5 @@
-// utils/UserManager.js
 const { questions } = require('./questions')
 
-// utils/UserManager.js
 class UserData {
   constructor(channelId) {
     this.channelId = channelId
@@ -11,6 +9,9 @@ class UserData {
     this.isNewResponse = true
     this.selectedOptions = new Map() // For storing select menu choices
     this.summaryMessageId = null // Add this line to track summary message ID
+    this.verificationCode = null // Store verification code
+    this.verificationStatus = 'pending' // 'pending', 'sent', 'verified', 'error'
+    this.isVerified = false // Track if the user is verified
   }
 
   updateResponse(questionId, response, type = 'modal') {
@@ -36,7 +37,9 @@ class UserData {
   }
 
   isComplete() {
-    return Object.keys(this.responses).length === questions.length
+    return (
+      Object.keys(this.responses).length === questions.length && this.isVerified
+    )
   }
 }
 

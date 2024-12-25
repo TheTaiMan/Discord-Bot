@@ -24,6 +24,7 @@ const questions = [
     inputStyle: 'Short',
     required: true,
     update: true,
+    verification: true, // Flag to indicate this question requires verification
   },
   {
     id: 'year',
