@@ -12,6 +12,7 @@ class UserData {
     this.verificationCode = null // Store verification code
     this.verificationStatus = 'pending' // 'pending', 'sent', 'verified', 'error'
     this.isVerified = false // Track if the user is verified
+    this.emailForVerification = null; 
   }
 
   updateResponse(questionId, response, type = 'modal') {

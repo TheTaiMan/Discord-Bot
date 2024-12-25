@@ -1,5 +1,5 @@
 const UserManager = require('../UserManager')
-const { sendVerificationEmail } = require('./brevo') // Updated path
+const { sendVerificationEmail } = require('../email/brevo')
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 
 // Function to generate a random verification code
@@ -28,49 +28,36 @@ const handleSendCode = async (interaction) => {
 
   // Store the verification code in userData
   userData.verificationCode = verificationCode
-  userData.verificationStatus = 'pending' // Add verification status
+  userData.verificationStatus = 'pending'
 
-  try {
-    const brevoResponse = await sendVerificationEmail(email, verificationCode);
-    if (brevoResponse.messageId) {
-      userData.verificationStatus = 'sent'
-      const enterCodeButton = new ButtonBuilder()
-        .setCustomId('enter-verification-code')
-        .setLabel('Enter Verification Code')
-        .setStyle(ButtonStyle.Primary)
+  // **Store the email in userData (important for webhook lookup)**
+  userData.emailForVerification = email // Add this line
 
-      const resendCodeButton = new ButtonBuilder()
-        .setCustomId('resend-verification-code')
-        .setLabel('Resend Code')
-        .setStyle(ButtonStyle.Secondary)
+  const isSent = await sendVerificationEmail(email, verificationCode)
 
-      const row = new ActionRowBuilder().addComponents(
-        enterCodeButton,
-        resendCodeButton
-      )
+  if (isSent) {
+    userData.verificationStatus = 'sent'
+    const enterCodeButton = new ButtonBuilder()
+      .setCustomId('enter-verification-code')
+      .setLabel('Enter Verification Code')
+      .setStyle(ButtonStyle.Primary)
 
-      await interaction.editReply({
-        content: 'Verification code sent! Please check your email.',
-        components: [row],
-        ephemeral: true,
-      })
-    } else {
-      // If sendVerificationEmail returns false, it implies an error (already handled in brevo.js log)
-      userData.verificationStatus = 'error'
-      const resendCodeButton = new ButtonBuilder()
-        .setCustomId('resend-verification-code')
-        .setLabel('Resend Code')
-        .setStyle(ButtonStyle.Danger)
+    const resendCodeButton = new ButtonBuilder()
+      .setCustomId('resend-verification-code')
+      .setLabel('Resend Code')
+      .setStyle(ButtonStyle.Secondary)
 
-      await interaction.editReply({
-        content:
-          'Error sending verification code. Please try again or contact a mod.',
-        components: [new ActionRowBuilder().addComponents(resendCodeButton)],
-        ephemeral: true,
-      })
-    }
-  } catch (error) {
-    console.error('Error in handleSendCode:', error)
+    const row = new ActionRowBuilder().addComponents(
+      enterCodeButton,
+      resendCodeButton
+    )
+
+    await interaction.editReply({
+      content: 'Verification code sent! Please check your email.',
+      components: [row],
+      ephemeral: true,
+    })
+  } else {
     userData.verificationStatus = 'error'
     const resendCodeButton = new ButtonBuilder()
       .setCustomId('resend-verification-code')
