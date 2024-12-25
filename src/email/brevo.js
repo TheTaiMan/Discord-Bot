@@ -20,11 +20,11 @@ async function sendVerificationEmail(email, verificationCode) {
 
   try {
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail)
-    console.log('Verification email sent successfully:', data)
-    return true
+    console.log('Verification email sent successfully:', data);
+    return data
   } catch (error) {
     console.error('Error sending verification email:', error)
-    return false
+    throw error
   }
 }
 

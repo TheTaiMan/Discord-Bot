@@ -4,8 +4,8 @@ const handleSkipButton = require('../interactions/handleSkipButton')
 const handleSubmit = require('../interactions/handleSubmit')
 const handleModalSubmission = require('../interactions/handleModalSubmission')
 const handleSelectMenu = require('../interactions/handleSelectMenu')
-const handleSendCode = require('../interactions/handleSendCode') // Import handleSendCode
-const handleVerifyCode = require('../interactions/handleVerifyCode') // Import handleVerifyCode
+const handleSendCode = require('../email/handleSendCode') // Import handleSendCode
+const handleVerifyCode = require('../email/handleVerifyCode') // Import handleVerifyCode
 const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js')
 
 
