@@ -3,7 +3,7 @@ const { questions } = require('./questions')
 class UserData {
   constructor(channelId, userId) {
     this.channelId = channelId
-    this.userId = userId // Store userId
+    this.userId = userId
     this.currentQuestion = 0
     this.responses = {}
     this.hasUpdatedResponse = false
@@ -18,8 +18,9 @@ class UserData {
   }
 
   updateResponse(questionId, response, type = 'modal') {
-    this.isNewResponse = !this.responses[questionId]
-    this.hasUpdatedResponse = !this.isNewResponse
+    const isExistingResponse = this.responses.hasOwnProperty(questionId)
+    this.isNewResponse = !isExistingResponse
+    this.hasUpdatedResponse = isExistingResponse
 
     if (type === 'select' || type === 'multiSelect') {
       this.selectedOptions.set(questionId, response)
@@ -30,8 +31,9 @@ class UserData {
       this.responses[questionId] = response
     }
 
+    // Move to the next question if it's a new response
     if (this.isNewResponse) {
-      this.currentQuestion += 1
+      this.currentQuestion++
     }
   }
 
@@ -48,11 +50,11 @@ class UserData {
   skipQuestion(questionId) {
     const isExistingResponse = this.responses.hasOwnProperty(questionId)
     this.isNewResponse = !isExistingResponse
-    this.hasUpdatedResponse = !this.isNewResponse
+    this.hasUpdatedResponse = isExistingResponse
 
     this.responses[questionId] = 'Skipped'
 
-    // Only increment current question if this is a new response
+    // Move to the next question if it's a new skip
     if (this.isNewResponse) {
       this.currentQuestion++
     }
@@ -64,14 +66,13 @@ class UserData {
   }
 }
 
-// This is how the bot can handle multiple responses at once
 class UserManager {
   constructor() {
     this.users = new Map()
   }
 
   createUser(userId, channelId) {
-    const userData = new UserData(channelId, userId) // Pass userId to UserData
+    const userData = new UserData(channelId, userId)
     this.users.set(userId, userData)
     return userData
   }
@@ -90,11 +91,11 @@ class UserManager {
   }
 
   skipQuestion(userId, questionId) {
-    const user = this.users.get(userId)
-    if (user) {
-      user.responses[questionId] = 'Skipped'
-      user.currentQuestion++
+    const userData = this.getUser(userId)
+    if (userData) {
+      return userData.skipQuestion(questionId)
     }
+    return null
   }
 
   printUserData(userId) {
@@ -108,14 +109,6 @@ class UserManager {
     this.users.delete(userId)
   }
 
-  skipQuestion(userId, questionId) {
-    const userData = this.getUser(userId)
-    if (userData) {
-      return userData.skipQuestion(questionId)
-    }
-    return null
-  }
-
   setVerificationInteraction(userId, interaction) {
     const userData = this.getUser(userId)
     if (userData) {
@@ -126,6 +119,13 @@ class UserManager {
   getVerificationInteraction(userId) {
     const userData = this.getUser(userId)
     return userData ? userData.verificationInteraction : null
+  }
+
+  moveToQuestion(userId, questionId) {
+    const userData = this.getUser(userId)
+    if (userData) {
+      userData.moveToQuestion(questionId)
+    }
   }
 }
 

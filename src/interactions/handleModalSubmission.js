@@ -18,7 +18,7 @@ async function handleEmailVerificationFlow(interaction, userData, response) {
 
   const row = new ActionRowBuilder().addComponents(editButton, sendCodeButton)
 
-  await channel.send({
+  await interaction.channel.send({
     content: `Your email is: ${response}. Please confirm or edit it.`,
     components: [row],
   })
@@ -46,22 +46,18 @@ const handleModalSubmission = async (interaction) => {
     ephemeral: true,
   })
 
+  const channel = await interaction.client.channels.fetch(userData.channelId)
+
   // Handle email verification flow
   if (question && question.id === 'email') {
     await handleEmailVerificationFlow(interaction, userData, response)
     return
   }
 
-  if (userData.hasUpdatedResponse && userData.isComplete()) {
-    await showSummary(
-      interaction.client.channels.cache.get(userData.channelId),
-      userData
-    )
+  if (userData.isComplete()) {
+    await showSummary(channel, userData)
   } else if (!userData.hasUpdatedResponse) {
-    await sendNextQuestion(
-      interaction.client.channels.cache.get(userData.channelId),
-      userData
-    )
+    await sendNextQuestion(channel, userData)
   }
 }
 

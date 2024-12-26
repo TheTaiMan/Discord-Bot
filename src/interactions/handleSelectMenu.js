@@ -1,6 +1,5 @@
 const showSummary = require('../utils/showSummery')
 const sendNextQuestion = require('../utils/sendNextQuestion')
-
 const UserManager = require('../UserManager')
 const { questions } = require('../questions')
 
@@ -30,10 +29,11 @@ const handleSelectMenu = async (interaction) => {
     ephemeral: true,
   })
 
-  if (userData.hasUpdatedResponse && userData.isComplete()) {
+  const channel = await interaction.client.channels.fetch(userData.channelId) // Revert to fetch
+
+  if (userData.isComplete()) {
     await showSummary(channel, userData)
   } else if (!userData.hasUpdatedResponse) {
-    const channel = await interaction.client.channels.fetch(userData.channelId)
     await sendNextQuestion(channel, userData)
   }
 }
