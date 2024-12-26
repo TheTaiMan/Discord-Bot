@@ -1,12 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const UserManager = require('./UserManager')
-const {
-  Client,
-  ButtonBuilder,
-  ButtonStyle,
-  ActionRowBuilder,
-} = require('discord.js')
+const handleBrevoEvent = require('./email/handleBrevoEvent')
+const { Client } = require('discord.js')
 
 const app = express()
 app.use(bodyParser.json())
@@ -64,102 +60,13 @@ app.post('/brevo-webhook', async (req, res) => {
 
   try {
     const channel = await discordClient.channels.fetch(userData.channelId)
-
-    switch (eventType) {
-      case 'request':
-        if (interaction && interaction.editReply) {
-          // Check if editReply is available
-          await interaction.editReply({
-            content: 'Verification email sent.',
-            components: [],
-          })
-        } else {
-          await channel.send({ content: 'Verification email sent.' }) // Fallback if no interaction
-        }
-        userData.verificationStatus = 'sent'
-        break
-      case 'delivered':
-        // Send a new, non-ephemeral message for delivery confirmation
-        const enterCodeButton = new ButtonBuilder()
-          .setCustomId('enter-verification-code')
-          .setLabel('Enter Verification Code')
-          .setStyle(ButtonStyle.Primary)
-        const row = new ActionRowBuilder().addComponents(enterCodeButton)
-        await channel.send({
-          content: 'Verification email delivered! Ready to verify your email?',
-          components: [row],
-        })
-        userData.verificationStatus = 'delivered'
-        // Clear the interaction so subsequent edits don't interfere
-        UserManager.setVerificationInteraction(userData.userId, null)
-        break
-      case 'soft_bounce':
-        if (interaction && interaction.editReply) {
-          await interaction.editReply({
-            content: `Verification email soft bounced. There might be a temporary issue with the recipient's inbox.`,
-            components: [],
-          })
-        } else {
-          await channel.send({
-            content: `Verification email soft bounced. There might be a temporary issue with the recipient's inbox.`,
-          })
-        }
-        userData.verificationStatus = 'soft_bounce'
-        break
-      case 'hard_bounce':
-        if (interaction && interaction.editReply) {
-          await interaction.editReply({
-            content: `Verification email hard bounced. Please check the email address you entered.`,
-            components: [],
-          })
-        } else {
-          await channel.send({
-            content: `Verification email hard bounced. Please check the email address you entered.`,
-          })
-        }
-        userData.verificationStatus = 'hard_bounce'
-        break
-      case 'error':
-        if (interaction && interaction.editReply) {
-          await interaction.editReply({
-            content: `An error occurred while sending the verification email.`,
-            components: [],
-          })
-        } else {
-          await channel.send({
-            content: `An error occurred while sending the verification email.`,
-          })
-        }
-        userData.verificationStatus = 'brevo_error'
-        break
-      case 'deferred':
-        if (interaction && interaction.editReply) {
-          await interaction.editReply({
-            content: `Verification email delivery is temporarily deferred.`,
-            components: [],
-          })
-        } else {
-          await channel.send({
-            content: `Verification email delivery is temporarily deferred.`,
-          })
-        }
-        userData.verificationStatus = 'deferred'
-        break
-      case 'blocked':
-        if (interaction && interaction.editReply) {
-          await interaction.editReply({
-            content: `Verification email was blocked.`,
-            components: [],
-          })
-        } else {
-          await channel.send({ content: `Verification email was blocked.` })
-        }
-        userData.verificationStatus = 'blocked'
-        break
-      default:
-        console.log('Unknown Brevo event:', eventType)
-    }
-
+    await handleBrevoEvent(
+      eventType,
+      recipientEmail,
+      userData,
+      interaction,
+      channel
+    )
     res.sendStatus(200)
   } catch (error) {
     console.error('Error handling Brevo webhook:', error)
