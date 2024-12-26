@@ -1,5 +1,6 @@
 const UserManager = require('../UserManager')
-const { sendVerificationEmail } = require('../email/brevo')
+const { sendVerificationEmail } = require('./brevo')
+const { verifyEmailAddress } = require('./verifyEmailAddress')
 
 // Function to generate a random verification code
 function generateVerificationCode() {
@@ -32,14 +33,25 @@ const handleSendCode = async (interaction) => {
   userData.emailForVerification = email
 
   try {
+    // Verify the email address before sending the verification email
+    verifyEmailAddress(email)
     await sendVerificationEmail(email, verificationCode)
+    userData.verificationStatus = 'sent'
   } catch (error) {
     console.error('Error sending verification email:', error)
+
+    // Simplified error message handling
+    const errorMessage =
+      error.message ===
+      'Invalid email address. Please use a university-affiliated email.'
+        ? error.message
+        : 'Failed to send verification code. Please try again later.'
+
     await interaction.editReply({
-      content:
-        'Failed to initiate sending the verification code. Please try again later.',
+      content: errorMessage,
       components: [],
     })
+
     userData.verificationStatus = 'error'
   }
 }

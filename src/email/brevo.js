@@ -3,7 +3,7 @@ const SibApiV3Sdk = require('sib-api-v3-sdk')
 const defaultClient = SibApiV3Sdk.ApiClient.instance
 
 let apiKey = defaultClient.authentications['api-key']
-apiKey.apiKey = process.env.BREVO_API_KEY // Ensure you have BREVO_API_KEY in your .env file
+apiKey.apiKey = process.env.BREVO_API_KEY
 
 let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi()
 
@@ -15,7 +15,7 @@ async function sendVerificationEmail(email, verificationCode) {
   sendSmtpEmail.sender = {
     name: 'Discord Bot',
     email: process.env.BREVO_SENDER_EMAIL,
-  } // Ensure you have BREVO_SENDER_EMAIL in your .env
+  }
   sendSmtpEmail.to = [{ email: email }]
 
   try {
