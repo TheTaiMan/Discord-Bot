@@ -1,23 +1,28 @@
 const { ActionRowBuilder } = require('discord.js')
 
-async function removeSkipButton(message) {
-  if (message && message.components && message.components.length > 0) {
-    const updatedComponents = message.components[0].components.filter(
-      (component) => !component.customId.startsWith('skip-')
-    )
+const removeSkipButton = async (message) => {
+  if (!message || !message.components || message.components.length === 0) {
+    return
+  }
 
-    if (updatedComponents.length < message.components[0].components.length) {
-      // Only edit if a skip button was actually removed
-      if (updatedComponents.length > 0) {
-        await message.edit({
-          components: [
-            new ActionRowBuilder().addComponents(...updatedComponents),
-          ],
-        })
-      } else {
-        await message.edit({ components: [] })
-      }
-    }
+  try {
+    const updatedComponents = message.components
+      .map((row) => {
+        const updatedButtons = row.components.filter(
+          (component) => !component.customId.startsWith('skip-')
+        )
+
+        return updatedButtons.length > 0
+          ? new ActionRowBuilder().addComponents(updatedButtons)
+          : null
+      })
+      .filter((row) => row !== null)
+
+    await message.edit({
+      components: updatedComponents.length > 0 ? updatedComponents : [],
+    })
+  } catch (error) {
+    console.error('Error removing skip button:', error)
   }
 }
 

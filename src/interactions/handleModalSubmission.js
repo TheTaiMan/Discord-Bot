@@ -2,7 +2,6 @@ const showSummary = require('../utils/showSummery')
 const sendNextQuestion = require('../utils/sendNextQuestion')
 const UserManager = require('../UserManager')
 const { questions } = require('../questions')
-const removeSkipButton = require('../utils/removeSkipButton')
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 
 async function handleEmailVerificationFlow(interaction, userData, response) {
@@ -23,20 +22,6 @@ async function handleEmailVerificationFlow(interaction, userData, response) {
     content: `Your email is: ${response}. Please confirm or edit it.`,
     components: [row],
   })
-}
-
-async function handleSkipButtonLogic(interaction, userData, question) {
-  const channel = await interaction.client.channels.fetch(userData.channelId)
-  const messages = await channel.messages.fetch({ limit: 1 })
-  const latestMessage = messages.first()
-
-  if (
-    question &&
-    !question.required &&
-    userData.currentQuestion < questions.length
-  ) {
-    await removeSkipButton(latestMessage)
-  }
 }
 
 const handleModalSubmission = async (interaction) => {
@@ -66,9 +51,6 @@ const handleModalSubmission = async (interaction) => {
     await handleEmailVerificationFlow(interaction, userData, response)
     return
   }
-
-  // Handle skip button removal
-  await handleSkipButtonLogic(interaction, userData, question)
 
   if (userData.hasUpdatedResponse && userData.isComplete()) {
     await showSummary(
