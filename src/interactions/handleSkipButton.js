@@ -15,7 +15,7 @@ const handleSkipButton = async (interaction) => {
   UserManager.skipQuestion(interaction.user.id, questionId)
 
   await interaction.reply({
-    content: `Question "${questionId}" has been ${wasQuestionAnswered ? 'changed to skipped' : 'skipped'}.`,
+    content: `This question has been ${wasQuestionAnswered ? 'changed to skipped' : 'skipped'}.`,
     ephemeral: true
   })
 
