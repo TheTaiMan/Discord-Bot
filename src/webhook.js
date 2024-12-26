@@ -35,7 +35,7 @@ app.post('/brevo-webhook', async (req, res) => {
       const user = await discordClient.users.fetch(userData.userId)
       const dmChannel = await user.createDM()
       // Attempt to find the initial message (you might need a way to identify it, e.g., by content)
-      const messages = await dmChannel.messages.fetch({ limit: 5 }) // Adjust limit as needed
+      const messages = await dmChannel.messages.fetch({ limit: 50 }) // Adjust limit as needed
       const initialMessage = messages.find(
         (msg) =>
           msg.author.id === discordClient.user.id &&
