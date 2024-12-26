@@ -6,8 +6,15 @@ const handleModalSubmission = require('../interactions/handleModalSubmission')
 const handleSelectMenu = require('../interactions/handleSelectMenu')
 const handleSendCode = require('../email/handleSendCode') // Import handleSendCode
 const handleVerifyCode = require('../email/handleVerifyCode') // Import handleVerifyCode
-const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js')
+const createModal = require('../components/createModal'); // Import createModal
+const {
+  ActionRowBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+} = require('discord.js')
 
+const { questions } = require('../questions')
 
 module.exports = {
   name: 'interactionCreate',
