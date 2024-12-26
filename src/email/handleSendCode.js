@@ -22,7 +22,7 @@ const handleSendCode = async (interaction) => {
     })
   }
 
-  UserManager.setVerificationInteraction(userId, interaction) // Store the interaction using userId
+  UserManager.setVerificationInteraction(userId, interaction) // Store the interaction IMMEDIATELY
 
   const email = userData.responses.email
   const verificationCode = generateVerificationCode()
