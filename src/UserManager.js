@@ -44,6 +44,24 @@ class UserData {
       Object.keys(this.responses).length === questions.length && this.isVerified
     )
   }
+
+  skipQuestion(questionId) {
+    const isExistingResponse = this.responses.hasOwnProperty(questionId)
+    this.isNewResponse = !isExistingResponse
+    this.hasUpdatedResponse = !this.isNewResponse
+
+    this.responses[questionId] = 'Skipped'
+
+    // Only increment current question if this is a new response
+    if (this.isNewResponse) {
+      this.currentQuestion++
+    }
+
+    return {
+      isNewResponse: this.isNewResponse,
+      hasUpdatedResponse: this.hasUpdatedResponse,
+    }
+  }
 }
 
 // This is how the bot can handle multiple responses at once
@@ -88,6 +106,14 @@ class UserManager {
 
   removeUser(userId) {
     this.users.delete(userId)
+  }
+
+  skipQuestion(userId, questionId) {
+    const userData = this.getUser(userId)
+    if (userData) {
+      return userData.skipQuestion(questionId)
+    }
+    return null
   }
 
   setVerificationInteraction(userId, interaction) {

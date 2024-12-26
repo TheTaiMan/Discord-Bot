@@ -3,7 +3,6 @@ const sendNextQuestion = require('../utils/sendNextQuestion')
 
 const UserManager = require('../UserManager')
 const { questions } = require('../questions')
-const removeSkipButton = require('../utils/removeSkipButton')
 
 const handleSelectMenu = async (interaction) => {
   const questionId = interaction.customId
@@ -31,22 +30,10 @@ const handleSelectMenu = async (interaction) => {
     ephemeral: true,
   })
 
-  const channel = await interaction.client.channels.fetch(userData.channelId)
-  const messages = await channel.messages.fetch({ limit: 1 })
-  const latestMessage = messages.first()
-
-  // Specifically check if this question is NOT required and it's not the last question
-  if (
-    question &&
-    !question.required &&
-    userData.currentQuestion < questions.length
-  ) {
-    await removeSkipButton(latestMessage)
-  }
-
   if (userData.hasUpdatedResponse && userData.isComplete()) {
     await showSummary(channel, userData)
   } else if (!userData.hasUpdatedResponse) {
+    const channel = await interaction.client.channels.fetch(userData.channelId)
     await sendNextQuestion(channel, userData)
   }
 }

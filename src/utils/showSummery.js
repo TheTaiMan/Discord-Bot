@@ -4,44 +4,37 @@ const createSubmitButton = require('../components/createSubmitButton')
 const formatResponseSummary = require('./formatResponseSummary')
 
 const showSummary = async (channel, userData) => {
-  const responsesSummary = formatResponseSummary(userData.responses)
-
-  // Filter questions based on the 'update' property
-  const updateQuestions = questions.filter((question) => question.update)
-
-  const updateComponents = await createUpdateComponents(updateQuestions)
-  const submitRow = createSubmitButton()
-
-  const components = [...updateComponents, submitRow].slice(0, 5)
-
-  // Delete the previous summary message if it exists
+  // Delete previous summary message if it exists
   if (userData.summaryMessageId) {
     try {
       const oldSummaryMessage = await channel.messages.fetch(
         userData.summaryMessageId
       )
       await oldSummaryMessage.delete()
-      console.log(
-        'Previous summary message deleted:',
-        userData.summaryMessageId
-      )
     } catch (error) {
       console.error('Error deleting previous summary message:', error)
-      // It's okay if the message was already deleted or couldn't be found
-    } finally {
-      // Regardless of deletion success, clear the old ID
-      userData.summaryMessageId = null
     }
+    // Clear the old message ID regardless of deletion success
+    userData.summaryMessageId = null
   }
+
+  const responsesSummary = formatResponseSummary(userData.responses)
+  const updateQuestions = questions.filter((question) => question.update)
+  const updateComponents = await createUpdateComponents(updateQuestions)
+  const submitRow = createSubmitButton()
+
+  // Combine components while respecting Discord's 5-component limit
+  const components = [...updateComponents, submitRow].slice(0, 5)
 
   try {
     const message = await channel.send({
       content: `Here's your information:\n${responsesSummary}\n\nWould you like to update anything?`,
       components,
     })
-    console.log('Summary message sent:', message.id)
-    // Store the ID of the new summary message
+
+    // Store the new summary message ID
     userData.summaryMessageId = message.id
+    console.log('New summary message sent with ID:', message.id)
   } catch (error) {
     console.error('Error sending summary message:', error)
   }

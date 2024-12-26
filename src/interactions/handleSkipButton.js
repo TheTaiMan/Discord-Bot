@@ -1,30 +1,36 @@
 const UserManager = require('../UserManager')
 const sendNextQuestion = require('../utils/sendNextQuestion')
 const removeSkipButton = require('../utils/removeSkipButton')
+const showSummary = require('../utils/showSummery')
+const { questions } = require('../questions')
 
 const handleSkipButton = async (interaction) => {
   const questionId = interaction.customId.replace('skip-', '')
   const userData = UserManager.getUser(interaction.user.id)
   if (!userData) return
 
-  // Check if the question was already answered before
-  const wasQuestionAnswered = userData.responses.hasOwnProperty(questionId) &&
-    userData.responses[questionId] !== 'Skipped'
-
-  // Skip the question (regardless of whether it was answered before)
-  UserManager.skipQuestion(interaction.user.id, questionId)
+  // Use the skipQuestion method from UserManager
+  const skipResult = UserManager.skipQuestion(interaction.user.id, questionId)
+  if (!skipResult) return
 
   await interaction.reply({
-    content: `This question has been ${wasQuestionAnswered ? 'changed to skipped' : 'skipped'}.`,
-    ephemeral: true
+    content: `This question has been ${
+      skipResult.hasUpdatedResponse ? 'changed to skipped' : 'skipped'
+    }.`,
+    ephemeral: true,
   })
 
-  // Remove the skip button using the utility function
+  // Remove the skip button from the message
   await removeSkipButton(interaction.message)
 
-  // Only send next question if we're on the current question
-  if (!wasQuestionAnswered) {
-    const channel = await interaction.client.channels.fetch(userData.channelId)
+  const channel = await interaction.client.channels.fetch(userData.channelId)
+
+  // If we have all questions answered (including skipped ones), show summary
+  if (Object.keys(userData.responses).length === questions.length) {
+    await showSummary(channel, userData)
+  }
+  // If this was a new response (not updating an existing one), proceed to next question
+  else if (skipResult.isNewResponse) {
     await sendNextQuestion(channel, userData)
   }
 }
