@@ -34,7 +34,7 @@ const showSummary = async (channel, userData) => {
 
     // Store the new summary message ID
     userData.summaryMessageId = message.id
-    console.log('New summary message sent with ID:', message.id)
+    // console.log('New summary message sent with ID:', message.id)
   } catch (error) {
     console.error('Error sending summary message:', error)
   }
