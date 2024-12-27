@@ -1,5 +1,3 @@
-// questions.js
-
 const questions = [
   {
     id: 'name',
@@ -61,11 +59,3 @@ const questions = [
 ]
 
 module.exports = { questions }
-
-// TODO: Make it so if a form is required or not, this would mean
-
-/*
- * for verification code, you should have a button saying send verification code, and then it should update with 'sent' if its actually sent, if there is an error say there is one, and
- * ask if they want the code to resend, and if there is a persistent error tell them to contact the mod.
- * if its sent successfully then there will be 2 buttons, enter verification code or resend.
- */
