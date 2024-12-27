@@ -1,5 +1,5 @@
-// src/email/handleBrevoEvent.js
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js')
+const UserManager = require('../UserManager')
 
 async function handleBrevoEventActions(
   eventType,
@@ -41,7 +41,7 @@ async function handleBrevoEvent(
     case 'hard_bounce':
     case 'error':
     case 'deferred':
-    case ' invalid_email':
+    case 'invalid_email':
     case 'blocked':
       await handleBrevoEventActions(eventType, interaction, channel, userData)
       userData.verificationStatus = eventType

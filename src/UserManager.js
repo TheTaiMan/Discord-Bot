@@ -74,6 +74,7 @@ class UserManager {
   createUser(userId, channelId) {
     const userData = new UserData(channelId, userId)
     this.users.set(userId, userData)
+    this.printAllUserData() // ! Print after user creation
     return userData
   }
 
@@ -85,6 +86,7 @@ class UserManager {
     const userData = this.getUser(userId)
     if (userData) {
       userData.updateResponse(questionId, response, type)
+      this.printAllUserData() // ! Print after updating response
       return userData
     }
     return null
@@ -93,7 +95,9 @@ class UserManager {
   skipQuestion(userId, questionId) {
     const userData = this.getUser(userId)
     if (userData) {
-      return userData.skipQuestion(questionId)
+      const result = userData.skipQuestion(questionId)
+      this.printAllUserData() // ! Print after skipping question
+      return result
     }
     return null
   }
@@ -101,18 +105,46 @@ class UserManager {
   printUserData(userId) {
     const userData = this.getUser(userId)
     if (userData) {
-      console.log(userData.responses)
+      console.log(`User ID: ${userId}`, userData.responses)
     }
+  }
+
+  printAllUserData() {
+    console.log('--- Current User Data ---')
+    if (this.users.size === 0) {
+      console.log('No users currently.')
+      return
+    }
+    this.users.forEach((userData, userId) => {
+      console.log(`User ID: ${userId}`, {
+        channelId: userData.channelId,
+        userId: userData.userId,
+        currentQuestion: userData.currentQuestion,
+        responses: userData.responses,
+        hasUpdatedResponse: userData.hasUpdatedResponse,
+        isNewResponse: userData.isNewResponse,
+        selectedOptions: Object.fromEntries(userData.selectedOptions), // Convert Map to object for printing
+        summaryMessageId: userData.summaryMessageId,
+        verificationCode: userData.verificationCode,
+        verificationStatus: userData.verificationStatus,
+        isVerified: userData.isVerified,
+        emailForVerification: userData.emailForVerification,
+        verificationInteraction: userData.verificationInteraction,
+      })
+    })
+    console.log('-------------------------')
   }
 
   removeUser(userId) {
     this.users.delete(userId)
+    this.printAllUserData() // ! Print after removing user
   }
 
   setVerificationInteraction(userId, interaction) {
     const userData = this.getUser(userId)
     if (userData) {
       userData.verificationInteraction = interaction
+      this.printAllUserData() // ! Print after removing user
     }
   }
 
@@ -125,6 +157,7 @@ class UserManager {
     const userData = this.getUser(userId)
     if (userData) {
       userData.moveToQuestion(questionId)
+      this.printAllUserData() // ! Print after removing user
     }
   }
 }
