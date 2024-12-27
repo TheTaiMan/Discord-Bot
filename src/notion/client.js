@@ -3,21 +3,12 @@ const { questions } = require('../questions')
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY })
 
-function convertOptionsToNotion(questionId, values, type = 'multiSelect') {
-  if (!values) return type === 'multiSelect' ? [] : null
-
-  // Ensure values is an array, even for single select
-  const valuesArray =
-    type === 'select'
-      ? [values]
-      : Array.isArray(values)
-      ? values
-      : values.split(', ')
+function convertOptionsToNotion(questionId, valuesArray, type = 'multiSelect') {
+  if (!valuesArray) return type === 'multiSelect' ? [] : null
 
   const question = questions.find((q) => q.id === questionId)
   if (!question || !question.options) return type === 'multiSelect' ? [] : null
 
-  // For multi-select, return an array of objects with labels
   if (type === 'multiSelect') {
     return valuesArray.map((value) => {
       const option = question.options.find((opt) => opt.value === value.trim())
@@ -27,7 +18,6 @@ function convertOptionsToNotion(questionId, values, type = 'multiSelect') {
     })
   }
 
-  // For single select, find the matching label
   const option = question.options.find((opt) => opt.value === valuesArray[0])
   return option ? { name: option.label } : null
 }
@@ -52,14 +42,14 @@ async function addUserToNotion(userData, discordUser) {
         Year: {
           select: convertOptionsToNotion(
             'year',
-            userData.responses.year,
+            userData.getSelectedOptions('year'), // Access selected options as an array
             'select'
           ),
         },
         Interests: {
           multi_select: convertOptionsToNotion(
             'interests',
-            userData.responses.interests
+            userData.getSelectedOptions('interests') // Access selected options as an array
           ),
         },
         'Discord Username': {

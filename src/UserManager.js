@@ -22,10 +22,9 @@ class UserData {
     this.hasUpdatedResponse = isExistingResponse
 
     if (type === 'select' || type === 'multiSelect') {
-      this.selectedOptions.set(questionId, response)
-      this.responses[questionId] = Array.isArray(response)
-        ? response.join(', ')
-        : response
+      const selectedValues = Array.isArray(response) ? response : [response]
+      this.selectedOptions.set(questionId, selectedValues)
+      this.responses[questionId] = selectedValues.join(', ')
     } else {
       this.responses[questionId] = response
     }

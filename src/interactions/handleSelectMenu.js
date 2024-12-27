@@ -16,11 +16,13 @@ const handleSelectMenu = async (interaction) => {
 
   userData.updateResponse(questionId, values, question.type)
 
-  const responseText = Array.isArray(values)
-    ? values
-        .map((v) => question.options.find((opt) => opt.value === v).label)
-        .join(', ')
-    : question.options.find((opt) => opt.value === values).label
+  // Construct the response text based on the selected values and question options
+  const responseText = values
+    .map((value) => {
+      const option = question.options.find((opt) => opt.value === value)
+      return option ? option.label : `Unknown option: ${value}` // Handle cases where the value might not be found
+    })
+    .join(', ')
 
   await interaction.reply({
     content: `Your ${questionId} has been ${
@@ -29,7 +31,7 @@ const handleSelectMenu = async (interaction) => {
     ephemeral: true,
   })
 
-  const channel = await interaction.client.channels.fetch(userData.channelId) // Revert to fetch
+  const channel = await interaction.client.channels.fetch(userData.channelId)
 
   if (userData.isComplete()) {
     await showSummary(channel, userData)
