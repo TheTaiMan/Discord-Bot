@@ -31,18 +31,11 @@ const handleModalSubmission = async (interaction) => {
   )
   const question = questions.find((q) => q.id === questionId)
 
-  const userData = UserManager.updateUserResponse(
-    interaction.user.id,
-    questionId,
-    response,
-    'modal'
-  )
+  const userData = UserManager.getUser(interaction.user.id)
   if (!userData) return
 
   await interaction.reply({
-    content: `Your ${questionId} has been ${
-      userData.isNewResponse ? 'recorded' : 'updated'
-    } to: "${response}"`,
+    content: `Your ${questionId} has been recorded as: "${response}"`,
     ephemeral: true,
   })
 
@@ -50,9 +43,20 @@ const handleModalSubmission = async (interaction) => {
 
   // Handle email verification flow
   if (question && question.id === 'email') {
+    userData.setEmailForVerification(response) // Store for verification
+    UserManager.setVerificationInteraction(interaction.user.id, interaction) // Store interaction
+    UserManager.printAllUserData() // ! Print all user data
     await handleEmailVerificationFlow(interaction, userData, response)
     return
   }
+
+  // For other questions, update the response and proceed
+  UserManager.updateUserResponse(
+    interaction.user.id,
+    questionId,
+    response,
+    'modal'
+  )
 
   if (userData.isComplete()) {
     await showSummary(channel, userData)

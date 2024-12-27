@@ -16,7 +16,7 @@ const handleSendCode = async (interaction) => {
   const userId = interaction.user.id
   const userData = UserManager.getUser(userId)
 
-  if (!userData || !userData.responses.email) {
+  if (!userData || !userData.emailForVerification) {
     return interaction.editReply({
       content: 'Email address not found. Please enter your email first.',
       components: [],
@@ -25,7 +25,7 @@ const handleSendCode = async (interaction) => {
 
   UserManager.setVerificationInteraction(userId, interaction) // Store the interaction IMMEDIATELY
 
-  const email = userData.responses.email
+  const email = userData.emailForVerification
   const verificationCode = generateVerificationCode()
 
   userData.verificationCode = verificationCode

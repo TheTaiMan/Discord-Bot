@@ -16,7 +16,10 @@ const handleVerifyCode = async (interaction) => {
   }
 
   if (userData.verificationCode === enteredCode) {
-    userData.isVerified = true // Mark user as verified
+    userData.markEmailAsVerified(userData.emailForVerification) // Mark email as verified and reset properties
+    userData.isNewResponse = true; // Treat verification as a new response for
+    userData.advanceToNextQuestion(); // Use the centralized method
+    UserManager.printAllUserData() // ! Print all user data
     await interaction.reply({
       content: 'Verification successful!',
       ephemeral: true,

@@ -12,7 +12,6 @@ class UserData {
     this.summaryMessageId = null
     this.verificationCode = null
     this.verificationStatus = 'pending'
-    this.isVerified = false
     this.emailForVerification = null
     this.verificationInteraction = null
   }
@@ -31,7 +30,10 @@ class UserData {
       this.responses[questionId] = response
     }
 
-    // Move to the next question if it's a new response
+    this.advanceToNextQuestion()
+  }
+
+  advanceToNextQuestion() {
     if (this.isNewResponse) {
       this.currentQuestion++
     }
@@ -42,9 +44,7 @@ class UserData {
   }
 
   isComplete() {
-    return (
-      Object.keys(this.responses).length === questions.length && this.isVerified
-    )
+    return Object.keys(this.responses).length === questions.length
   }
 
   skipQuestion(questionId) {
@@ -53,16 +53,24 @@ class UserData {
     this.hasUpdatedResponse = isExistingResponse
 
     this.responses[questionId] = 'Skipped'
-
-    // Move to the next question if it's a new skip
-    if (this.isNewResponse) {
-      this.currentQuestion++
-    }
+    this.advanceToNextQuestion()
 
     return {
       isNewResponse: this.isNewResponse,
       hasUpdatedResponse: this.hasUpdatedResponse,
     }
+  }
+
+  setEmailForVerification(email) {
+    this.emailForVerification = email
+  }
+
+  markEmailAsVerified(email) {
+    this.responses['email'] = email
+    this.emailForVerification = null
+    this.verificationInteraction = null
+    this.verificationStatus = 'pending' // Reset to 'pending' even though its complete
+    this.verificationCode = null
   }
 }
 
@@ -127,9 +135,8 @@ class UserManager {
         summaryMessageId: userData.summaryMessageId,
         verificationCode: userData.verificationCode,
         verificationStatus: userData.verificationStatus,
-        isVerified: userData.isVerified,
         emailForVerification: userData.emailForVerification,
-        verificationInteraction: userData.verificationInteraction,
+        /* verificationInteraction: userData.verificationInteraction, */
       })
     })
     console.log('-------------------------')
@@ -144,21 +151,12 @@ class UserManager {
     const userData = this.getUser(userId)
     if (userData) {
       userData.verificationInteraction = interaction
-      this.printAllUserData() // ! Print after removing user
     }
   }
 
   getVerificationInteraction(userId) {
     const userData = this.getUser(userId)
     return userData ? userData.verificationInteraction : null
-  }
-
-  moveToQuestion(userId, questionId) {
-    const userData = this.getUser(userId)
-    if (userData) {
-      userData.moveToQuestion(questionId)
-      this.printAllUserData() // ! Print after removing user
-    }
   }
 }
 

@@ -16,7 +16,7 @@ const handleSubmit = async (interaction) => {
         components: [],
       })
 
-      UserManager.printUserData(interaction.user.id)
+      UserManager.printUserData(interaction.user.id) // ! Print User Data
       UserManager.removeUser(interaction.user.id)
 
       // Self-destruct the current channel
