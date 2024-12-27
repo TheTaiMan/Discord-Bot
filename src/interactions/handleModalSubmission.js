@@ -1,28 +1,8 @@
 const showSummary = require('../utils/showSummery')
 const sendNextQuestion = require('../utils/sendNextQuestion')
+const handleEmailVerificationFlow = require('../email/handleEmailVerificationFlow')
 const UserManager = require('../UserManager')
 const { questions } = require('../questions')
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
-
-async function handleEmailVerificationFlow(interaction, userData, response) {
-  const channel = await interaction.client.channels.fetch(userData.channelId)
-  const editButton = new ButtonBuilder()
-    .setCustomId('edit-email')
-    .setLabel('Edit Email')
-    .setStyle(ButtonStyle.Secondary)
-
-  const sendCodeButton = new ButtonBuilder()
-    .setCustomId('send-verification-code')
-    .setLabel('Send Code')
-    .setStyle(ButtonStyle.Primary)
-
-  const row = new ActionRowBuilder().addComponents(editButton, sendCodeButton)
-
-  await interaction.channel.send({
-    content: `Your email is: ${response}. Please confirm or edit it.`,
-    components: [row],
-  })
-}
 
 const handleModalSubmission = async (interaction) => {
   const questionId = interaction.customId.replace('-modal', '')
@@ -43,9 +23,6 @@ const handleModalSubmission = async (interaction) => {
 
   // Handle email verification flow
   if (question && question.id === 'email') {
-    userData.setEmailForVerification(response) // Store for verification
-    UserManager.setVerificationInteraction(interaction.user.id, interaction) // Store interaction
-    UserManager.printAllUserData() // ! Print all user data
     await handleEmailVerificationFlow(interaction, userData, response)
     return
   }
