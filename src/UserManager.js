@@ -14,6 +14,8 @@ class UserData {
     this.verificationStatus = 'pending'
     this.emailForVerification = null
     this.verificationInteraction = null
+    this.emailSendCount = 0 // Initialize email send count
+    this.verificationMessageId = null // Store the ID of the ephemeral verification message
   }
 
   updateResponse(questionId, response, type = 'modal') {
@@ -62,6 +64,7 @@ class UserData {
 
   setEmailForVerification(email) {
     this.emailForVerification = email
+    this.emailSendCount = 0 // Reset send count when email is edited
   }
 
   markEmailAsVerified(email) {
@@ -70,6 +73,7 @@ class UserData {
     this.verificationInteraction = null
     this.verificationStatus = 'pending' // Reset to 'pending' even though its complete
     this.verificationCode = null
+    this.verificationMessageId = null
   }
 }
 
@@ -135,6 +139,8 @@ class UserManager {
         verificationCode: userData.verificationCode,
         verificationStatus: userData.verificationStatus,
         emailForVerification: userData.emailForVerification,
+        emailSendCount: userData.emailSendCount,
+        verificationMessageId: userData.verificationMessageId,
         /* verificationInteraction: userData.verificationInteraction, */
       })
     })

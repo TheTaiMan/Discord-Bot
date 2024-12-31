@@ -1,3 +1,4 @@
+// src/events/interactionCreate.js
 const handleOnboarding = require('../interactions/handleOnboarding')
 const handleModal = require('../interactions/handleModal')
 const handleSkipButton = require('../interactions/handleSkipButton')
@@ -38,9 +39,17 @@ async function handleButtonInteraction(interaction) {
   } else if (customId === 'submit-form') {
     await handleSubmit(interaction)
   } else if (customId === 'send-verification-code') {
-    await handleSendCode(interaction)
+    // Defer the reply immediately and then call handleSendCode
+    if (!interaction.replied && !interaction.deferred) {
+      await interaction.deferReply({ ephemeral: true })
+      await handleSendCode(interaction)
+    }
   } else if (customId === 'resend-verification-code') {
-    await handleSendCode(interaction) // Reuse handleSendCode for resend
+    // Defer the reply immediately and then call handleSendCode
+    if (!interaction.replied && !interaction.deferred) {
+      await interaction.deferReply({ ephemeral: true })
+      await handleSendCode(interaction)
+    }
   } else if (customId === 'enter-verification-code') {
     const modal = createVerificationCodeModal()
     await interaction.showModal(modal)
