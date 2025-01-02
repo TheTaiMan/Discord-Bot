@@ -36,31 +36,12 @@ async function handleBrevoEvent(eventType, recipientEmail, userData, channel) {
     // Handle specific event types
     switch (eventType) {
       case 'delivered':
-        // Delete the original message with buttons
-        if (userData.originalButtonMessageId) {
-          await deleteMessage({
-            messageId: userData.originalButtonMessageId,
-            channel,
-          })
-          userData.setOriginalButtonMessageId(null)
-        }
-
         await createVerificationPrompt(channel)
         break
-
       case 'error':
       case 'invalid_email':
       case 'hard_bounce':
       case 'blocked':
-        // Clean up old messages
-        if (userData.originalButtonMessageId) {
-          await deleteMessage({
-            messageId: userData.originalButtonMessageId,
-            channel,
-          })
-          userData.setOriginalButtonMessageId(null)
-        }
-
         userData.resetEmailVerification()
         await createRetryPrompt(channel)
         break
