@@ -51,7 +51,7 @@ class UserData {
   }
 
   setEmailForVerification(email) {
-    this.emailForVerification = email
+    this.emailForVerification = email.toLowerCase()
   }
 
   markEmailAsVerified(email) {

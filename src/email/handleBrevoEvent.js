@@ -1,6 +1,5 @@
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js')
 const { STATUS_MESSAGES, updateStatusMessage } = require('./emailStatusManager')
-const { deleteMessage } = require('../utils/deleteMessage')
 const UserManager = require('../UserManager')
 
 async function handleBrevoEvent(eventType, recipientEmail, userData, channel) {
