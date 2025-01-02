@@ -8,7 +8,7 @@ apiKey.apiKey = process.env.BREVO_API_KEY
 let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi()
 
 // Function to send a verification email
-async function sendVerificationEmail(email, verificationCode) {
+async function sendVerificationEmail(email, verificationCode, userData) {
   const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail()
   sendSmtpEmail.subject = 'Your Verification Code'
   sendSmtpEmail.htmlContent = `<html><body><p>Your verification code is: <strong>${verificationCode}</strong></p></body></html>`
@@ -20,7 +20,8 @@ async function sendVerificationEmail(email, verificationCode) {
 
   try {
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail)
-    console.log('Verification email sent successfully:', data);
+    console.log('Verification email sent successfully:', data)
+    userData.incrementVerificationAttempts()
     return data
   } catch (error) {
     console.error('Error sending verification email:', error)

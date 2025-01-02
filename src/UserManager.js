@@ -10,26 +10,15 @@ class UserData {
     this.isNewResponse = true
     this.selectedOptions = new Map()
     this.summaryMessageId = null
+
+    // Email verification properties
     this.verificationCode = null
     this.verificationStatus = 'pending'
     this.emailForVerification = null
-    this.verificationInteraction = null
-  }
-
-  updateResponse(questionId, response, type = 'modal') {
-    const isExistingResponse = this.responses.hasOwnProperty(questionId)
-    this.isNewResponse = !isExistingResponse
-    this.hasUpdatedResponse = isExistingResponse
-
-    if (type === 'select' || type === 'multiSelect') {
-      const selectedValues = Array.isArray(response) ? response : [response]
-      this.selectedOptions.set(questionId, selectedValues)
-      this.responses[questionId] = selectedValues.join(', ')
-    } else {
-      this.responses[questionId] = response
-    }
-
-    this.advanceToNextQuestion()
+    this.verificationAttempts = 0
+    this.statusMessageId = null
+    this.lastEmailStatus = null
+    this.originalButtonMessageId = null
   }
 
   advanceToNextQuestion() {
@@ -66,10 +55,57 @@ class UserData {
 
   markEmailAsVerified(email) {
     this.responses['email'] = email
+  }
+
+  // New methods
+  setStatusMessageId(messageId) {
+    this.statusMessageId = messageId
+  }
+
+  setOriginalButtonMessageId(messageId) {
+    this.originalButtonMessageId = messageId
+  }
+
+  incrementVerificationAttempts() {
+    this.verificationAttempts++
+    return this.verificationAttempts
+  }
+
+  hasExceededVerificationAttempts() {
+    return this.verificationAttempts >= 3
+  }
+
+  resetEmailVerification() {
     this.emailForVerification = null
-    this.verificationInteraction = null
-    this.verificationStatus = 'pending' // Reset to 'pending' even though its complete
     this.verificationCode = null
+    this.verificationStatus = 'pending'
+    this.lastEmailStatus = null
+    this.statusMessageId = null
+    this.originalButtonMessageId = null
+  }
+
+  updateEmailStatus(status) {
+    if (this.lastEmailStatus === 'delivered' && status === 'sent') {
+      return false
+    }
+    this.lastEmailStatus = status
+    return true
+  }
+
+  updateResponse(questionId, response, type = 'modal') {
+    const isExistingResponse = this.responses.hasOwnProperty(questionId)
+    this.isNewResponse = !isExistingResponse
+    this.hasUpdatedResponse = isExistingResponse
+
+    if (type === 'select' || type === 'multiSelect') {
+      const selectedValues = Array.isArray(response) ? response : [response]
+      this.selectedOptions.set(questionId, selectedValues)
+      this.responses[questionId] = selectedValues.join(', ')
+    } else {
+      this.responses[questionId] = response
+    }
+
+    this.advanceToNextQuestion()
   }
 }
 
@@ -81,7 +117,7 @@ class UserManager {
   createUser(userId, channelId) {
     const userData = new UserData(channelId, userId)
     this.users.set(userId, userData)
-    this.printAllUserData() // ! Print after user creation
+    this.printAllUserData()
     return userData
   }
 
@@ -93,7 +129,7 @@ class UserManager {
     const userData = this.getUser(userId)
     if (userData) {
       userData.updateResponse(questionId, response, type)
-      this.printAllUserData() // ! Print after updating response
+      this.printAllUserData()
       return userData
     }
     return null
@@ -103,10 +139,15 @@ class UserManager {
     const userData = this.getUser(userId)
     if (userData) {
       const result = userData.skipQuestion(questionId)
-      this.printAllUserData() // ! Print after skipping question
+      this.printAllUserData()
       return result
     }
     return null
+  }
+
+  removeUser(userId) {
+    this.users.delete(userId)
+    this.printAllUserData()
   }
 
   printUserData(userId) {
@@ -130,32 +171,18 @@ class UserManager {
         responses: userData.responses,
         hasUpdatedResponse: userData.hasUpdatedResponse,
         isNewResponse: userData.isNewResponse,
-        selectedOptions: Object.fromEntries(userData.selectedOptions), // Convert Map to object for printing
+        selectedOptions: Object.fromEntries(userData.selectedOptions),
         summaryMessageId: userData.summaryMessageId,
         verificationCode: userData.verificationCode,
         verificationStatus: userData.verificationStatus,
         emailForVerification: userData.emailForVerification,
-        /* verificationInteraction: userData.verificationInteraction, */
+        verificationAttempts: userData.verificationAttempts,
+        statusMessageId: userData.statusMessageId,
+        lastEmailStatus: userData.lastEmailStatus,
+        originalButtonMessageId: userData.originalButtonMessageId,
       })
     })
     console.log('-------------------------')
-  }
-
-  removeUser(userId) {
-    this.users.delete(userId)
-    this.printAllUserData() // ! Print after removing user
-  }
-
-  setVerificationInteraction(userId, interaction) {
-    const userData = this.getUser(userId)
-    if (userData) {
-      userData.verificationInteraction = interaction
-    }
-  }
-
-  getVerificationInteraction(userId) {
-    const userData = this.getUser(userId)
-    return userData ? userData.verificationInteraction : null
   }
 }
 

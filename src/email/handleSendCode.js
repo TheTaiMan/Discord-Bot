@@ -1,55 +1,66 @@
 const UserManager = require('../UserManager')
-const { sendVerificationEmail } = require('./brevo')
+const { sendVerificationEmail } = require('./sendVerificationEmail')
 const { verifyEmailAddress } = require('./verifyEmailAddress')
 
-// Function to generate a random verification code
 function generateVerificationCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString() // 6-digit code
+  return Math.floor(100000 + Math.random() * 900000).toString()
 }
 
 const handleSendCode = async (interaction) => {
-  await interaction.reply({
-    content: 'Attempting to send verification code...',
-    ephemeral: true,
-  })
-
   const userId = interaction.user.id
   const userData = UserManager.getUser(userId)
 
   if (!userData || !userData.emailForVerification) {
-    return interaction.editReply({
+    await interaction.reply({
       content: 'Email address not found. Please enter your email first.',
-      components: [],
+      ephemeral: true,
     })
+    return
   }
 
-  UserManager.setVerificationInteraction(userId, interaction) // Store the interaction IMMEDIATELY
+  // Delete the original message with the Send Code button
+  try {
+    if (userData.originalButtonMessageId) {
+      const originalMessage = await interaction.channel.messages.fetch(
+        userData.originalButtonMessageId
+      )
+      await originalMessage.delete()
+    }
+  } catch (error) {
+    console.error('Error deleting original message:', error)
+  }
+
+  // Create a new status message
+  const statusMessage = await interaction.channel.send({
+    content: 'Attempting to send verification code...',
+    ephemeral: true,
+  })
+
+  // Store the status message ID
+  userData.setStatusMessageId(statusMessage.id)
 
   const email = userData.emailForVerification
   const verificationCode = generateVerificationCode()
 
   userData.verificationCode = verificationCode
-  userData.verificationStatus = 'pending_send'
-  userData.emailForVerification = email
+  userData.verificationStatus = 'pending'
 
+  UserManager.printAllUserData()
   try {
-    // Verify the email address before sending the verification email
     verifyEmailAddress(email)
-    await sendVerificationEmail(email, verificationCode)
-    userData.verificationStatus = 'sent'
+    await sendVerificationEmail(email, verificationCode, userData)
+    // Don't update status here - let the webhook handle it
   } catch (error) {
     console.error('Error sending verification email:', error)
 
-    // Simplified error message handling
     const errorMessage =
       error.message ===
       'Invalid email address. Please use a university-affiliated email.'
         ? error.message
         : 'Failed to send verification code. Please try again later.'
 
-    await interaction.editReply({
+    await statusMessage.edit({
       content: errorMessage,
-      components: [],
     })
 
     userData.verificationStatus = 'error'

@@ -12,11 +12,11 @@ src/
 │   ├── createUpdateSelectMenu.js
 │   └── createVerificationCodeModal.js
 ├── email/
-│   ├── brevo.js
 │   ├── handleBrevoEvent.js
 │   ├── handleEmailVerificationFlow.js
 │   ├── handleSendCode.js
 │   ├── handleVerifyCode.js
+│   ├── sendVerificationEmail.js
 │   └── verifyEmailAddress.js
 ├── events/
 │   ├── interactionCreate.js
