@@ -13,12 +13,11 @@ class UserData {
 
     // Email verification properties
     this.verificationCode = null
-    this.verificationStatus = 'pending'
     this.emailForVerification = null
     this.verificationAttempts = 0
-    this.statusMessageId = null
     this.lastEmailStatus = null
     this.originalButtonMessageId = null
+    this.statusMessageId = null
     this.sendCodeMessageId = null
   }
 
@@ -78,7 +77,6 @@ class UserData {
 
   resetEmailVerification() {
     this.verificationCode = null
-    this.verificationStatus = 'pending'
     this.emailForVerification = null
     this.statusMessageId = null
     this.lastEmailStatus = null
@@ -175,7 +173,6 @@ class UserManager {
         selectedOptions: Object.fromEntries(userData.selectedOptions),
         summaryMessageId: userData.summaryMessageId,
         verificationCode: userData.verificationCode,
-        verificationStatus: userData.verificationStatus,
         emailForVerification: userData.emailForVerification,
         verificationAttempts: userData.verificationAttempts,
         statusMessageId: userData.statusMessageId,
