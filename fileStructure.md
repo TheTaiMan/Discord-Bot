@@ -33,6 +33,8 @@ src/
 │   └── client.js
 ├── utils/
 │   ├── formatResponseSummary.js
+│   ├── deleteMessage.js
+│   ├── disableButton.js
 │   ├── removeSkipButton.js
 │   ├── selfDestruct.js
 │   ├── sendNextQuestion.js

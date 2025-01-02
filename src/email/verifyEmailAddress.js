@@ -1,10 +1,10 @@
-function verifyEmailAddress(email) {
+const verifyEmailAddress = async (email) => {
   if (!email.endsWith('@gmail.com')) {
     throw new Error(
       'Invalid email address. Please use a university-affiliated email.'
     )
   }
-  return true // Or simply don't return anything on success
+  return true
 }
 
 module.exports = { verifyEmailAddress }

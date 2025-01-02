@@ -14,11 +14,6 @@ const handleModalSubmission = async (interaction) => {
   const userData = UserManager.getUser(interaction.user.id)
   if (!userData) return
 
-  await interaction.reply({
-    content: `Your ${questionId} has been recorded as: "${response}"`,
-    ephemeral: true,
-  })
-
   const channel = await interaction.client.channels.fetch(userData.channelId)
 
   // Handle email verification flow
@@ -34,6 +29,10 @@ const handleModalSubmission = async (interaction) => {
     response,
     'modal'
   )
+  await interaction.reply({
+    content: `Your ${questionId} has been recorded as: "${response}"`,
+    ephemeral: true,
+  })
 
   if (userData.isComplete()) {
     await showSummary(channel, userData)

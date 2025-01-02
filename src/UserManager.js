@@ -19,6 +19,7 @@ class UserData {
     this.statusMessageId = null
     this.lastEmailStatus = null
     this.originalButtonMessageId = null
+    this.sendCodeMessageId = null
   }
 
   advanceToNextQuestion() {
@@ -76,16 +77,16 @@ class UserData {
   }
 
   resetEmailVerification() {
-    this.emailForVerification = null
     this.verificationCode = null
     this.verificationStatus = 'pending'
-    this.lastEmailStatus = null
+    this.emailForVerification = null
     this.statusMessageId = null
+    this.lastEmailStatus = null
     this.originalButtonMessageId = null
   }
 
   updateEmailStatus(status) {
-    if (this.lastEmailStatus === 'delivered' && status === 'sent') {
+    if (this.lastEmailStatus === 'delivered' && status === 'request') {
       return false
     }
     this.lastEmailStatus = status
