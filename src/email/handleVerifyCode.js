@@ -1,6 +1,7 @@
 const UserManager = require('../UserManager')
 const sendNextQuestion = require('../utils/sendNextQuestion')
-const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js')
+const { deleteMessage } = require('../utils/deleteMessage') // Import deleteMessage
+
 
 const handleVerifyCode = async (interaction) => {
   const userId = interaction.user.id
@@ -26,6 +27,12 @@ const handleVerifyCode = async (interaction) => {
       content: 'Email verification successful!',
       ephemeral: true,
     })
+
+    // Delete the verification prompt message
+    if (userData.verificationPromptMessage) {
+      await deleteMessage({ message: userData.verificationPromptMessage })
+      userData.verificationPromptMessage = null // Clear the stored message
+    }
 
     userData.resetEmailVerification()
     console.log(
@@ -63,26 +70,11 @@ const handleVerifyCode = async (interaction) => {
     } else {
       // Still has attempts remaining
       const remainingAttempts = 3 - userData.verificationAttempts
-      const enterCodeButton = new ButtonBuilder()
-        .setCustomId('enter-verification-code')
-        .setLabel('Try Again')
-        .setStyle(ButtonStyle.Primary)
-
-      const resendButton = new ButtonBuilder()
-        .setCustomId('resend-verification-code')
-        .setLabel('Resend Code')
-        .setStyle(ButtonStyle.Secondary)
-
-      const row = new ActionRowBuilder().addComponents(
-        enterCodeButton,
-        resendButton
-      )
 
       await interaction.reply({
         content: `Incorrect code. You have ${remainingAttempts} attempt${
           remainingAttempts === 1 ? '' : 's'
         } remaining.`,
-        components: [row],
         ephemeral: true,
       })
     }

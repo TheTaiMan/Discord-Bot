@@ -15,10 +15,9 @@ class UserData {
     this.verificationCode = null
     this.emailForVerification = null
     this.verificationAttempts = 0
-    this.lastEmailStatus = null
     this.originalButtonMessageId = null
-    this.statusMessageId = null
     this.sendCodeMessageId = null
+    this.verificationPromptMessage = null; // Add this line
   }
 
   advanceToNextQuestion() {
@@ -57,11 +56,6 @@ class UserData {
     this.responses['email'] = email
   }
 
-  // New methods
-  setStatusMessageId(messageId) {
-    this.statusMessageId = messageId
-  }
-
   setOriginalButtonMessageId(messageId) {
     this.originalButtonMessageId = messageId
   }
@@ -81,14 +75,7 @@ class UserData {
     this.statusMessageId = null
     this.lastEmailStatus = null
     this.originalButtonMessageId = null
-  }
-
-  updateEmailStatus(status) {
-    if (this.lastEmailStatus === 'delivered' && status === 'request') {
-      return false
-    }
-    this.lastEmailStatus = status
-    return true
+    this.verificationPromptMessage = null; 
   }
 
   updateResponse(questionId, response, type = 'modal') {
@@ -175,8 +162,6 @@ class UserManager {
         verificationCode: userData.verificationCode,
         emailForVerification: userData.emailForVerification,
         verificationAttempts: userData.verificationAttempts,
-        statusMessageId: userData.statusMessageId,
-        lastEmailStatus: userData.lastEmailStatus,
         originalButtonMessageId: userData.originalButtonMessageId,
       })
     })

@@ -1,6 +1,7 @@
 const UserManager = require('../UserManager')
 const { sendVerificationEmail } = require('./sendVerificationEmail')
 const { disableButton } = require('../utils/disableButton')
+const createVerificationPrompt = require('../components/createVerificationPrompt') // Import the function
 
 const MAX_RESEND_ATTEMPTS = 3
 
@@ -43,12 +44,6 @@ const handleSendCode = async (interaction) => {
 
   const verificationCode = generateVerificationCode()
 
-  // Create/update status message
-  const statusMessage = await interaction.channel.send({
-    content: 'Attempting to send verification code...',
-  })
-  userData.setStatusMessageId(statusMessage.id)
-
   try {
     await sendVerificationEmail(
       userData.emailForVerification,
@@ -57,9 +52,7 @@ const handleSendCode = async (interaction) => {
     )
     userData.verificationCode = verificationCode
     userData.verificationStatus = 'pending'
-    userData.updateEmailStatus(null)
 
-    // Delete the message containing the send code button
     if (userData.sendCodeMessageId) {
       try {
         const sendCodeMessage = await interaction.channel.messages.fetch(
@@ -72,14 +65,15 @@ const handleSendCode = async (interaction) => {
       }
     }
 
-    const remainingAttempts =
-      MAX_RESEND_ATTEMPTS - userData.verificationAttempts
     await interaction.editReply({
-      content: `Verification code has been sent. You have ${remainingAttempts} resend ${
-        remainingAttempts === 1 ? 'attempt' : 'attempts'
-      } remaining.`,
+      content: `Verification code has been sent. Please enter it below.`,
       ephemeral: true,
     })
+
+    // Immediately show the verification prompt and store the message
+    userData.verificationPromptMessage = await createVerificationPrompt(
+      interaction.channel
+    )
   } catch (error) {
     console.error('Error sending verification email:', error)
     userData.verificationStatus = 'error'
