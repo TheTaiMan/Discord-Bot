@@ -12,7 +12,6 @@ src/
 │   ├── createUpdateSelectMenu.js
 │   └── createVerificationCodeModal.js
 ├── email/
-│   ├── handleBrevoEvent.js
 │   ├── handleEmailVerificationFlow.js
 │   ├── handleSendCode.js
 │   ├── handleVerifyCode.js
@@ -43,4 +42,3 @@ src/
 ├── index.js
 ├── questions.js
 ├── UserManager.js
-└── webhook.js
