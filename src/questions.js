@@ -1,5 +1,14 @@
 const questions = [
   {
+    id: 'confirmation',
+    type: 'confirmation',
+    question: 'Would you like to continue with this onboarding process? This will require your University of Manitoba student email.',
+    continueLabel: 'Continue',
+    endLabel: 'End Onboarding',
+    required: true,
+    update: false,
+  },
+  {
     id: 'name',
     type: 'modal',
     question: 'What is your full name?',

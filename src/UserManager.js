@@ -31,7 +31,9 @@ class UserData {
   }
 
   isComplete() {
-    return Object.keys(this.responses).length === questions.length
+    // Count questions that actually need responses (exclude confirmation type)
+    const questionsNeedingResponses = questions.filter(q => q.type !== 'confirmation').length
+    return Object.keys(this.responses).length === questionsNeedingResponses
   }
 
   skipQuestion(questionId) {
@@ -50,6 +52,12 @@ class UserData {
 
   setEmailForVerification(email) {
     this.emailForVerification = email.toLowerCase()
+  }
+
+  storeEmailMapping(userManager) {
+    if (this.emailForVerification) {
+      userManager.addEmailMapping(this.emailForVerification, this.userId)
+    }
   }
 
   markEmailAsVerified(email) {
@@ -98,6 +106,7 @@ class UserData {
 class UserManager {
   constructor() {
     this.users = new Map()
+    this.emailToUserMap = new Map() // Maps email -> userId for webhook lookups
   }
 
   createUser(userId, channelId) {
@@ -132,8 +141,24 @@ class UserManager {
   }
 
   removeUser(userId) {
+    const userData = this.users.get(userId)
+    if (userData && userData.emailForVerification) {
+      this.emailToUserMap.delete(userData.emailForVerification)
+    }
     this.users.delete(userId)
     this.printAllUserData()
+  }
+
+  addEmailMapping(email, userId) {
+    this.emailToUserMap.set(email.toLowerCase(), userId)
+  }
+
+  getUserIdByEmail(email) {
+    return this.emailToUserMap.get(email.toLowerCase())
+  }
+
+  removeEmailMapping(email) {
+    this.emailToUserMap.delete(email.toLowerCase())
   }
 
   printUserData(userId) {

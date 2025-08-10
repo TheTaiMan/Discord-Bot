@@ -34,10 +34,18 @@ const handleModalSubmission = async (interaction) => {
     ephemeral: true,
   })
 
+  console.log(`User ${interaction.user.id} - isComplete: ${userData.isComplete()}, hasUpdatedResponse: ${userData.hasUpdatedResponse}`)
+  
   if (userData.isComplete()) {
+    // Always show updated summary when user is complete
+    console.log('Showing updated summary for complete user')
     await showSummary(channel, userData)
   } else if (!userData.hasUpdatedResponse) {
+    // Only continue to next question if user hasn't updated and isn't complete
+    console.log('Sending next question')
     await sendNextQuestion(channel, userData)
+  } else {
+    console.log('User updated response but is not complete - no action taken')
   }
 }
 

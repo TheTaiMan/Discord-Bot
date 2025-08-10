@@ -1,4 +1,5 @@
 const SibApiV3Sdk = require('sib-api-v3-sdk')
+const UserManager = require('../UserManager')
 
 const defaultClient = SibApiV3Sdk.ApiClient.instance
 
@@ -22,6 +23,10 @@ async function sendVerificationEmail(email, verificationCode, userData) {
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail)
     console.log('Verification email sent successfully:', data)
     userData.incrementVerificationAttempts()
+    
+    // Store email mapping for webhook lookups
+    UserManager.addEmailMapping(email, userData.userId)
+    
     return data
   } catch (error) {
     console.error('Error sending verification email:', error)

@@ -41,7 +41,14 @@ const handleVerifyCode = async (interaction) => {
     UserManager.printAllUserData()
 
     const channel = await interaction.client.channels.fetch(userData.channelId)
-    await sendNextQuestion(channel, userData)
+    
+    // Check if user is complete and should see summary, or continue with questions
+    if (userData.isComplete()) {
+      const showSummary = require('../utils/showSummery')
+      await showSummary(channel, userData)
+    } else {
+      await sendNextQuestion(channel, userData)
+    }
   } else {
     // Failed verification
 

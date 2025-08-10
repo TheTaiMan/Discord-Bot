@@ -58,5 +58,78 @@ async function handleButtonInteraction(interaction) {
       )
       await interaction.showModal(modal)
     }
+  } else if (customId === 'continue-onboarding') {
+    await handleContinueOnboarding(interaction)
+  } else if (customId === 'end-onboarding') {
+    await handleEndOnboarding(interaction)
+  }
+}
+
+async function handleContinueOnboarding(interaction) {
+  const UserManager = require('../UserManager')
+  const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js')
+  const userData = UserManager.getUser(interaction.user.id)
+  
+  if (!userData) {
+    await interaction.reply({
+      content: 'User data not found. Please start the onboarding process again.',
+      flags: require('discord.js').MessageFlags.Ephemeral,
+    })
+    return
+  }
+
+  // Disable the Continue button and keep End Onboarding active
+  const disabledContinueButton = new ButtonBuilder()
+    .setCustomId('continue-onboarding-disabled')
+    .setLabel('Continue')
+    .setStyle(ButtonStyle.Primary)
+    .setDisabled(true)
+  
+  const endButton = new ButtonBuilder()
+    .setCustomId('end-onboarding')
+    .setLabel('End Onboarding')
+    .setStyle(ButtonStyle.Danger)
+  
+  const updatedRow = new ActionRowBuilder().addComponents(disabledContinueButton, endButton)
+
+  // Update the original message to disable the Continue button
+  await interaction.update({
+    components: [updatedRow]
+  })
+
+  // Move to the next question (skip the confirmation question)
+  userData.currentQuestion = 1
+  const sendNextQuestion = require('../utils/sendNextQuestion')
+  
+  await sendNextQuestion(interaction.channel, userData)
+}
+
+async function handleEndOnboarding(interaction) {
+  const UserManager = require('../UserManager')
+  const selfDestruct = require('../utils/selfDestruct')
+  const userData = UserManager.getUser(interaction.user.id)
+  
+  if (!userData) {
+    await interaction.reply({
+      content: 'User data not found.',
+      flags: require('discord.js').MessageFlags.Ephemeral,
+    })
+    return
+  }
+
+  // Self-destruct: Clean up user data and use the existing self-destruct method
+  try {
+    await interaction.reply({
+      content: '🔴 **Onboarding Cancelled**\n\nThank you for your time!',
+      flags: require('discord.js').MessageFlags.Ephemeral,
+    })
+    
+    // Clean up user data
+    UserManager.removeUser(interaction.user.id)
+    
+    // Use the existing self-destruct method (same as completion)
+    await selfDestruct(interaction.channel)
+  } catch (error) {
+    console.error('Error handling end onboarding:', error)
   }
 }

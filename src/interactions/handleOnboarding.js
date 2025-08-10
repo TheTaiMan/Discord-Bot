@@ -1,6 +1,7 @@
 const UserManager = require('../UserManager')
 const createChannel = require('../components/createChannel')
 const sendNextQuestion = require('../utils/sendNextQuestion')
+const { MessageFlags } = require('discord.js')
 
 
 // Handles the On Boarding Button press
@@ -15,7 +16,7 @@ const handleOnboarding = async (interaction) => {
       // If channel exists, direct them to it
       await interaction.reply({
         content: `You already have an ongoing verification process. Please check ${existingChannel} to complete your verification.`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       return
     }
@@ -33,14 +34,29 @@ const handleOnboarding = async (interaction) => {
     await sendNextQuestion(channel, userData)
     await interaction.reply({
       content: `Please check ${channel} to complete your verification.`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     })
   } catch (error) {
     console.error('Channel creation error:', error)
-    await interaction.reply({
-      content: 'Sorry, there was an error creating your private channel.',
-      ephemeral: true,
-    })
+    
+    // Try to send error message to the onboarding channel if it exists
+    const onboardingChannel = interaction.guild.channels.cache.find(
+      (channel) => channel.name === `onboarding-${interaction.user.id}`
+    )
+    
+    if (onboardingChannel) {
+      await onboardingChannel.send({
+        content: 'Sorry, there was an error during the onboarding process. Please try again.',
+      })
+    }
+    
+    // Only reply to interaction if we haven't already and no channel exists
+    if (!interaction.replied && !interaction.deferred && !onboardingChannel) {
+      await interaction.reply({
+        content: 'Sorry, there was an error creating your private channel.',
+        flags: MessageFlags.Ephemeral,
+      })
+    }
   }
 }
 
