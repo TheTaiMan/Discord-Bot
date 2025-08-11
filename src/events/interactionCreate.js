@@ -107,15 +107,21 @@ async function handleContinueOnboarding(interaction) {
 async function handleEndOnboarding(interaction) {
   const UserManager = require('../UserManager')
   const selfDestruct = require('../utils/selfDestruct')
-  const userData = UserManager.getUser(interaction.user.id)
   
-  if (!userData) {
+  // Find user data based on the channel name (onboarding-{userId})
+  const channelName = interaction.channel.name
+  const userIdMatch = channelName.match(/onboarding-(\d+)/)
+  
+  if (!userIdMatch) {
     await interaction.reply({
-      content: 'User data not found.',
+      content: 'This is not a valid onboarding channel.',
       flags: require('discord.js').MessageFlags.Ephemeral,
     })
     return
   }
+  
+  const targetUserId = userIdMatch[1]
+  const userData = UserManager.getUser(targetUserId)
 
   // Self-destruct: Clean up user data and use the existing self-destruct method
   try {
@@ -124,8 +130,10 @@ async function handleEndOnboarding(interaction) {
       flags: require('discord.js').MessageFlags.Ephemeral,
     })
     
-    // Clean up user data
-    UserManager.removeUser(interaction.user.id)
+    // Clean up user data if it exists
+    if (userData) {
+      UserManager.removeUser(targetUserId)
+    }
     
     // Use the existing self-destruct method (same as completion)
     await selfDestruct(interaction.channel)

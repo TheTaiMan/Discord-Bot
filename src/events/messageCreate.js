@@ -3,16 +3,18 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  PermissionFlagsBits,
 } = require('discord.js')
 
 module.exports = {
   name: 'messageCreate',
   async execute(msg) {
-    if (msg.content === '!setup-onboarding') { // ! Make sure user has proper permissions
-      const channel = await msg.guild.channels.create({
-        name: 'onboarding',
-        type: ChannelType.GuildText,
-      })
+    if (msg.content === '!setup-onboarding') {
+      // Check if user has administrator permissions
+      if (!msg.member.permissions.has(PermissionFlagsBits.Administrator)) {
+        await msg.reply('You need administrator permissions to use this command.')
+        return
+      }
 
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
@@ -21,12 +23,12 @@ module.exports = {
           .setStyle(ButtonStyle.Primary)
       )
 
-      await channel.send({
+      await msg.channel.send({
         content:
-          'Welcome to the server! Click the button below to start the onboarding process.',
+          "# Welcome to the server!\nClick the button below to start the onboarding process.",
         components: [row],
       })
-      console.log('Onboarding channel and welcome message created!')
+      console.log('Onboarding welcome message sent!')
     }
   },
 }

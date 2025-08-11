@@ -7,6 +7,16 @@ const { MessageFlags } = require('discord.js')
 // Handles the On Boarding Button press
 const handleOnboarding = async (interaction) => {
   try {
+    // Check if user already has the club member role
+    const memberRole = interaction.guild.roles.cache.find(role => role.name === 'Club Member')
+    if (memberRole && interaction.member.roles.cache.has(memberRole.id)) {
+      await interaction.reply({
+        content: "You're already a member! You don't need to complete the onboarding process.",
+        flags: MessageFlags.Ephemeral,
+      })
+      return
+    }
+
     // Check if a channel already exists for this user
     const existingChannel = interaction.guild.channels.cache.find(
       (channel) => channel.name === `onboarding-${interaction.user.id}`
