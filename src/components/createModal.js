@@ -13,7 +13,7 @@ const createModal = (
   inputStyle,
   required,
   minLength = 1,
-  maxLength = 100
+  maxLength = 1000
 ) => {
   const modal = new ModalBuilder().setCustomId(customId).setTitle(title)
 

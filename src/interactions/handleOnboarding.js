@@ -37,8 +37,22 @@ const handleOnboarding = async (interaction) => {
 
     // Welcome Message
     await channel.send({
-      content:
-        'Welcome! We want to confirm that you are a university student for you to be a member and have full access to the server.',
+      content: `# 🎓 Welcome to the Verification Process!
+
+👋 Hi there, <@${interaction.user.id}>!
+
+We're excited to have you join our community! To ensure this server remains a **safe space for university students**, we need to verify your student status.
+
+**📚 What we need from you:**
+- Proof of current university enrollment
+- A few quick questions about your academic journey
+
+**🔒 Your privacy matters:**
+- This channel is private between you and our bot
+- Your information is handled securely
+- Only verified students gain full server access
+
+Let's get started! 🚀`,
     })
 
     await sendNextQuestion(channel, userData)

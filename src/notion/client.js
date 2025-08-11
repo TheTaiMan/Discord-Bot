@@ -39,18 +39,63 @@ async function addUserToNotion(userData, discordUser) {
         Email: {
           email: userData.responses.email || '',
         },
-        Year: {
+        Games: {
+          multi_select: convertOptionsToNotion(
+            'games',
+            userData.getSelectedOptions('games')
+          ),
+        },
+        'Other Games': {
+          rich_text: [
+            {
+              text: {
+                content: userData.responses.other_games || '',
+              },
+            },
+          ],
+        },
+        'Participation Type': {
           select: convertOptionsToNotion(
-            'year',
-            userData.getSelectedOptions('year'), // Access selected options as an array
+            'participation',
+            userData.getSelectedOptions('participation'),
             'select'
           ),
         },
-        Interests: {
-          multi_select: convertOptionsToNotion(
-            'interests',
-            userData.getSelectedOptions('interests') // Access selected options as an array
-          ),
+        'Discord Features': {
+          rich_text: [
+            {
+              text: {
+                content: userData.responses.discord_features || '',
+              },
+            },
+          ],
+        },
+        Incentives: {
+          rich_text: [
+            {
+              text: {
+                content: userData.responses.incentives || '',
+              },
+            },
+          ],
+        },
+        'Non Gaming Events': {
+          rich_text: [
+            {
+              text: {
+                content: userData.responses.non_gaming_events || '',
+              },
+            },
+          ],
+        },
+        'Exec Comments': {
+          rich_text: [
+            {
+              text: {
+                content: userData.responses.exec_comments || '',
+              },
+            },
+          ],
         },
         'Discord Username': {
           rich_text: [
@@ -61,8 +106,13 @@ async function addUserToNotion(userData, discordUser) {
             },
           ],
         },
-        'Discord ID': {
+        'Discord User ID': {
           number: parseInt(discordUser.id),
+        },
+        Status: {
+          status: {
+            name: 'Zero Strikes',
+          },
         },
       },
     })
