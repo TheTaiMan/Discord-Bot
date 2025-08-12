@@ -83,7 +83,8 @@ class UserData {
     this.statusMessageId = null
     this.lastEmailStatus = null
     this.originalButtonMessageId = null
-    this.verificationPromptMessage = null; 
+    this.verificationPromptMessage = null
+    this.verificationAttempts = 0
   }
 
   updateResponse(questionId, response, type = 'modal') {

@@ -1,6 +1,9 @@
 const UserManager = require('../UserManager')
 const sendNextQuestion = require('../utils/sendNextQuestion')
 const { deleteMessage } = require('../utils/deleteMessage') // Import deleteMessage
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js')
+const selfDestruct = require('../utils/selfDestruct')
+const { questions } = require('../questions')
 
 
 const handleVerifyCode = async (interaction) => {
@@ -21,7 +24,7 @@ const handleVerifyCode = async (interaction) => {
     // Successful verification
     userData.markEmailAsVerified(userData.emailForVerification)
     userData.isNewResponse = true
-    userData.advanceToNextQuestion()
+    // Don't advance question - let user continue with current question
 
     await interaction.reply({
       content: 'Email verification successful!',
@@ -42,15 +45,37 @@ const handleVerifyCode = async (interaction) => {
 
     const channel = await interaction.client.channels.fetch(userData.channelId)
     
-    // Check if user is complete and should see summary, or continue with questions
+    // Store the current question before advancing
+    const originalQuestion = userData.currentQuestion
+    
+    // Advance to next unanswered question since current question (email) is now answered
+    while (userData.currentQuestion < questions.length) {
+      const currentQuestion = questions[userData.currentQuestion]
+      if (!currentQuestion) break
+      
+      // If current question is already answered, advance to next
+      if (userData.responses.hasOwnProperty(currentQuestion.id)) {
+        userData.currentQuestion++
+      } else {
+        break // Found unanswered question
+      }
+    }
+    
+    // Check if user is complete and should see summary, or continue with next unanswered question
     if (userData.isComplete()) {
       const showSummary = require('../utils/showSummery')
       await showSummary(channel, userData)
     } else {
-      await sendNextQuestion(channel, userData)
+      // Only send next question if we actually advanced to a new question
+      // If we're still on the same question, it's already displayed
+      if (userData.currentQuestion !== originalQuestion) {
+        await sendNextQuestion(channel, userData)
+      }
+      // If currentQuestion === originalQuestion, the question is already shown, do nothing
     }
   } else {
-    // Failed verification
+    // Failed verification - increment attempt counter
+    userData.incrementVerificationAttempts()
 
     console.log(
       userData.emailForVerification + ' User invalid verification code'
@@ -58,22 +83,14 @@ const handleVerifyCode = async (interaction) => {
     UserManager.printAllUserData()
 
     if (userData.hasExceededVerificationAttempts()) {
-      // Exceeded maximum attempts
-      const editEmailButton = new ButtonBuilder()
-        .setCustomId('edit-email')
-        .setLabel('Enter New Email')
-        .setStyle(ButtonStyle.Primary)
-
-      const row = new ActionRowBuilder().addComponents(editEmailButton)
-
+      // Exceeded maximum attempts - self destruct
       await interaction.reply({
-        content:
-          'Maximum verification attempts exceeded. Please enter a different email address.',
-        components: [row],
-        ephemeral: true,
+        content: 'Maximum verification attempts exceeded. This channel will self-destruct.',
+        flags: require('discord.js').MessageFlags.Ephemeral,
       })
 
-      userData.resetEmailVerification()
+      // Trigger self-destruction with user cleanup
+      await selfDestruct(interaction.channel, userId)
     } else {
       // Still has attempts remaining
       const remainingAttempts = 5 - userData.verificationAttempts
@@ -82,7 +99,7 @@ const handleVerifyCode = async (interaction) => {
         content: `Incorrect code. You have ${remainingAttempts} attempt${
           remainingAttempts === 1 ? '' : 's'
         } remaining.`,
-        ephemeral: true,
+        flags: require('discord.js').MessageFlags.Ephemeral,
       })
     }
   }

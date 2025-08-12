@@ -1,7 +1,7 @@
 const verifyEmailAddress = async (email) => {
-  if (!email.endsWith('@gmail.com')) {
+  if (!email.endsWith('@myumanitoba.ca')) {
     throw new Error(
-      'Invalid email address. Please use a university-affiliated email.'
+      'Invalid email address. Please use your @myumanitoba.ca email.'
     )
   }
   return true
