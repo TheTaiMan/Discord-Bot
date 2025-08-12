@@ -37,22 +37,25 @@ const handleOnboarding = async (interaction) => {
 
     // Welcome Message
     await channel.send({
-      content: `# 🎓 Welcome to the Verification Process!
+      content: `# 🎮 Welcome to the University of Manitoba Gaming Club!
 
 👋 Hi there, <@${interaction.user.id}>!
 
-We're excited to have you join our community! To ensure this server remains a **safe space for university students**, we need to verify your student status.
+We're excited to have you join our gaming community! To ensure this server remains a **safe space for UofM students**, we need to verify your student status and get to know your gaming interests.
 
 **📚 What we need from you:**
-- Proof of current university enrollment
-- A few quick questions about your academic journey
+- Your University of Manitoba student email (@myumanitoba.ca)
+- Your full name
+- Gaming preferences and participation style
+- Ideas for club activities and events
 
 **🔒 Your privacy matters:**
 - This channel is private between you and our bot
+- Admins can close inactive channels after a week, but cannot see your responses
 - Your information is handled securely
-- Only verified students gain full server access
+- Membership gives you full server access (Smash weekly is open to all)
 
-Let's get started! 🚀`,
+Ready to level up your university gaming experience? Let's get started! 🚀`,
     })
 
     await sendNextQuestion(channel, userData)

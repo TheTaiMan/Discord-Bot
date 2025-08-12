@@ -107,6 +107,7 @@ async function handleContinueOnboarding(interaction) {
 async function handleEndOnboarding(interaction) {
   const UserManager = require('../UserManager')
   const selfDestruct = require('../utils/selfDestruct')
+  const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js')
   
   // Find user data based on the channel name (onboarding-{userId})
   const channelName = interaction.channel.name
@@ -123,10 +124,30 @@ async function handleEndOnboarding(interaction) {
   const targetUserId = userIdMatch[1]
   const userData = UserManager.getUser(targetUserId)
 
+  // Disable both buttons immediately
+  const disabledContinueButton = new ButtonBuilder()
+    .setCustomId('continue-onboarding-disabled')
+    .setLabel('Continue')
+    .setStyle(ButtonStyle.Primary)
+    .setDisabled(true)
+  
+  const disabledEndButton = new ButtonBuilder()
+    .setCustomId('end-onboarding-disabled')
+    .setLabel('End Onboarding')
+    .setStyle(ButtonStyle.Danger)
+    .setDisabled(true)
+  
+  const disabledRow = new ActionRowBuilder().addComponents(disabledContinueButton, disabledEndButton)
+
   // Self-destruct: Clean up user data and use the existing self-destruct method
   try {
-    await interaction.reply({
-      content: '🔴 **Onboarding Cancelled**\n\nThank you for your time!',
+    // Update the message to disable both buttons, then reply
+    await interaction.update({
+      components: [disabledRow]
+    })
+    
+    await interaction.followUp({
+      content: '# Onboarding Cancelled\n\nThank you for your time!',
       flags: require('discord.js').MessageFlags.Ephemeral,
     })
     
