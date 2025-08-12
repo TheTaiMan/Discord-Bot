@@ -151,13 +151,9 @@ async function handleEndOnboarding(interaction) {
       flags: require('discord.js').MessageFlags.Ephemeral,
     })
     
-    // Clean up user data if it exists
-    if (userData) {
-      UserManager.removeUser(targetUserId)
-    }
-    
     // Use the existing self-destruct method (same as completion)
-    await selfDestruct(interaction.channel)
+    // selfDestruct will handle user cleanup automatically
+    await selfDestruct(interaction.channel, targetUserId)
   } catch (error) {
     console.error('Error handling end onboarding:', error)
   }

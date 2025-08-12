@@ -74,7 +74,7 @@ class UserData {
   }
 
   hasExceededVerificationAttempts() {
-    return this.verificationAttempts >= 3
+    return this.verificationAttempts >= 5
   }
 
   resetEmailVerification() {

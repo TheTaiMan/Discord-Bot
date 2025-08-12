@@ -37,10 +37,9 @@ const handleSubmit = async (interaction) => {
       }
 
       UserManager.printUserData(interaction.user.id) // ! Print User Data
-      UserManager.removeUser(interaction.user.id)
 
-      // Self-destruct the current channel
-      await selfDestruct(interaction.channel)
+      // Self-destruct the current channel (this will handle user cleanup automatically)
+      await selfDestruct(interaction.channel, interaction.user.id)
     } catch (error) {
       console.error('Error submitting form:', error)
       try {

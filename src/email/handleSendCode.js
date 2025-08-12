@@ -2,8 +2,9 @@ const UserManager = require('../UserManager')
 const { sendVerificationEmail } = require('./sendVerificationEmail')
 const { disableButton } = require('../utils/disableButton')
 const createVerificationPrompt = require('../components/createVerificationPrompt') // Import the function
+const selfDestruct = require('../utils/selfDestruct')
 
-const MAX_RESEND_ATTEMPTS = 3
+const MAX_RESEND_ATTEMPTS = 5
 
 function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString()
@@ -26,9 +27,13 @@ const handleSendCode = async (interaction) => {
   // Check resend attempts
   if (userData.verificationAttempts >= MAX_RESEND_ATTEMPTS) {
     await interaction.editReply({
-      content: `You've exceeded the maximum number of resend attempts. Please try again later.`,
+      content: `You've exceeded the maximum number of resend attempts. This channel will self-destruct.`,
       ephemeral: true,
     })
+    
+    // Trigger self-destruction
+    const channel = interaction.channel
+    await selfDestruct(channel, userId)
     return
   }
 

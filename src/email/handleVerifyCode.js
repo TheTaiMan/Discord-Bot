@@ -76,7 +76,7 @@ const handleVerifyCode = async (interaction) => {
       userData.resetEmailVerification()
     } else {
       // Still has attempts remaining
-      const remainingAttempts = 3 - userData.verificationAttempts
+      const remainingAttempts = 5 - userData.verificationAttempts
 
       await interaction.reply({
         content: `Incorrect code. You have ${remainingAttempts} attempt${

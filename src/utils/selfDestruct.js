@@ -1,6 +1,7 @@
 const { setTimeout } = require('node:timers/promises')
+const UserManager = require('../UserManager')
 
-async function selfDestruct(channel, options = {}) {
+async function selfDestruct(channel, userId = null, options = {}) {
   const {
     countdownEmojis = [
       '🔟',
@@ -36,6 +37,12 @@ async function selfDestruct(channel, options = {}) {
 
     // Short pause before deletion
     await setTimeout(500)
+
+    // Clean up user data before deleting channel
+    if (userId) {
+      console.log(`Cleaning up user data for ${userId} during self-destruction`)
+      UserManager.removeUser(userId)
+    }
 
     // Delete the channel
     await channel.delete('Onboarding process completed')
