@@ -18,7 +18,10 @@ const createVerificationPrompt = async (channel) => {
 
   const message = await channel.send({
     content:
-      'Ready to verify your email? Enter the verification code sent to your inbox.',
+      `Ready to verify your email? Enter the verification code sent to your inbox.
+
+📩 **Can\'t find the email?**
+- ||Please check your junk mail or spam folder.||`,
     components: [row],
     ephemeral: false,
   })
