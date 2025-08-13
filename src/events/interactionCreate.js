@@ -40,6 +40,19 @@ async function handleButtonInteraction(interaction) {
   } else if (customId === 'send-verification-code') {
     await handleSendCode(interaction)
   } else if (customId === 'resend-verification-code') {
+    // Check if the button is currently disabled (on cooldown)
+    const button = interaction.message.components
+      .flatMap(row => row.components)
+      .find(component => component.customId === 'resend-verification-code')
+    
+    if (button && button.disabled) {
+      await interaction.reply({
+        content: 'Please wait before requesting another verification code.',
+        ephemeral: true,
+      })
+      return
+    }
+    
     await handleSendCode(interaction) // Reuse handleSendCode for resend
   } else if (customId === 'enter-verification-code') {
     const modal = createVerificationCodeModal()

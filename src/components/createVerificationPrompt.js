@@ -21,7 +21,7 @@ const createVerificationPrompt = async (channel) => {
       `Ready to verify your email? Enter the verification code sent to your inbox.
 
 📩 **Can\'t find the email?**
-- ||Please check your junk mail or spam folder.||`,
+# Please check your junk mail or spam folder.`,
     components: [row],
     ephemeral: false,
   })

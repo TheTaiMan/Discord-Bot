@@ -1,6 +1,7 @@
 const UserManager = require('../UserManager')
 const { sendVerificationEmail } = require('./sendVerificationEmail')
 const { disableButton } = require('../utils/disableButton')
+const { cooldownButton } = require('../utils/cooldownButton')
 const createVerificationPrompt = require('../components/createVerificationPrompt') // Import the function
 const selfDestruct = require('../utils/selfDestruct')
 
@@ -37,13 +38,14 @@ const handleSendCode = async (interaction) => {
     return
   }
 
-  // Disable the send code button immediately
+  // Disable both the send code button and edit email button immediately
   if (interaction.message) {
     try {
       await disableButton(interaction.message, 'send-verification-code')
+      await disableButton(interaction.message, 'edit-email')
       userData.sendCodeMessageId = interaction.message.id
     } catch (error) {
-      console.error('Error disabling send code button:', error)
+      console.error('Error disabling buttons:', error)
     }
   }
 
@@ -75,10 +77,25 @@ const handleSendCode = async (interaction) => {
       ephemeral: true,
     })
 
+    // Delete previous verification prompt if it exists
+    if (userData.verificationPromptMessage) {
+      try {
+        await userData.verificationPromptMessage.delete()
+      } catch (error) {
+        console.error('Error deleting previous verification prompt:', error)
+        // Continue even if deletion fails
+      }
+    }
+
     // Immediately show the verification prompt and store the message
     userData.verificationPromptMessage = await createVerificationPrompt(
       interaction.channel
     )
+
+    // Apply 40-second cooldown to the resend button
+    if (userData.verificationPromptMessage) {
+      await cooldownButton(userData.verificationPromptMessage, 'resend-verification-code', 40000)
+    }
   } catch (error) {
     console.error('Error sending verification email:', error)
     userData.verificationStatus = 'error'
