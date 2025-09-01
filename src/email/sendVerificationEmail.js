@@ -14,7 +14,7 @@ async function sendVerificationEmail(email, verificationCode, userData) {
   sendSmtpEmail.subject = 'Your Verification Code'
   sendSmtpEmail.htmlContent = `<html><body><p>Your verification code is: <strong>${verificationCode}</strong></p></body></html>`
   sendSmtpEmail.sender = {
-    name: 'Discord Bot',
+    name: 'LANLord',
     email: process.env.BREVO_SENDER_EMAIL,
   }
   sendSmtpEmail.to = [{ email: email }]
